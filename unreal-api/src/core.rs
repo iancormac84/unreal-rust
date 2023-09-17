@@ -1,10 +1,14 @@
-use bevy_ecs::{prelude::*, schedule::ScheduleLabel, system::Command};
+use bevy_ecs::{prelude::*, schedule::ExecutorKind, system::Command};
 use std::ffi::c_void;
 
 use std::panic;
 
 use ffi::{EventType, Quaternion, StrRustAlloc};
-use unreal_api::{module::ReflectionRegistry, Component};
+use unreal_api::{
+    main_schedule::{Main, MainScheduleOrder},
+    module::ReflectionRegistry,
+    Component,
+};
 use unreal_reflect::{
     registry::{ReflectType, ReflectValue},
     Entity, Uuid, World,
@@ -14,6 +18,7 @@ use crate::{
     api::UnrealApi,
     ffi::{self, AActorOpaque},
     input::Input,
+    main_schedule::{PostUpdate, PreUpdate, RegisterEvent},
     math::{Quat, Vec3},
     module::{bindings, Module, UserModule},
     physics::PhysicsComponent,
@@ -38,15 +43,17 @@ impl Plugin for CorePlugin {
             => module
         };
 
+        let mut main_schedule = Schedule::new();
+        main_schedule.set_executor_kind(ExecutorKind::SingleThreaded);
+
         module
             .insert_resource(Frame::default())
             .insert_resource(Time::default())
             .insert_resource(Input::default())
             .insert_resource(UnrealApi::default())
-            .add_schedule(RegisterEvent)
-            .add_schedule(RegisterEvent CoreStage::PreUpdate)
-            .add_schedule(CoreStage::PreUpdate, CoreStage::Update)
-            .add_schedule(CoreStage::Update, CoreStage::PostUpdate)
+            .add_schedule(Main, main_schedule)
+            .init_resource::<MainScheduleOrder>()
+            .add_systems(Main, Main::run_main)
             // TODO: Order matters here. Needs to be defined after the stages
             .add_event::<OnActorBeginOverlapEvent>()
             .add_event::<OnActorEndOverlapEvent>()
@@ -513,21 +520,6 @@ pub fn register_core_components(registry: &mut ReflectionRegistry) {
     registry.register::<ParentComponent>();
     registry.register::<PhysicsComponent>();
 }
-
-#[derive(Debug, Hash, PartialEq, Eq, Clone, ScheduleLabel)]
-pub struct Startup;
-
-#[derive(Debug, Hash, PartialEq, Eq, Clone, ScheduleLabel)]
-pub struct RegisterEvent;
-
-#[derive(Debug, Hash, PartialEq, Eq, Clone, ScheduleLabel)]
-pub struct PreUpdate;
-
-#[derive(Debug, Hash, PartialEq, Eq, Clone, ScheduleLabel)]
-pub struct Update;
-
-#[derive(Debug, Hash, PartialEq, Eq, Clone, ScheduleLabel)]
-pub struct PostUpdate;
 
 #[derive(Resource, Default, Debug, Copy, Clone)]
 pub struct Frame {

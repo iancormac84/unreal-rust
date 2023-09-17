@@ -7,6 +7,7 @@ pub mod core;
 pub mod editor_component;
 pub mod input;
 pub mod log;
+mod main_schedule;
 pub mod module;
 pub mod physics;
 pub mod plugin;

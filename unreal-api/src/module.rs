@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use bevy_ecs::{
     event::Event,
     prelude::{Events, System},
-    schedule::{ExecutorKind, Schedule, ScheduleLabel},
+    schedule::{Schedule, ScheduleLabel},
     system::Resource,
 };
 use unreal_reflect::{registry::ReflectDyn, uuid, TypeUuid, World};
@@ -92,20 +92,13 @@ impl ReflectionRegistry {
 }
 
 pub struct Module {
-    pub(crate) schedule: Schedule,
-    pub(crate) startup: Schedule,
     pub reflection_registry: ReflectionRegistry,
     pub(crate) world: World,
 }
 
 impl Module {
     pub fn new() -> Self {
-        let mut startup =
-            Schedule::default().set_executor_kind(ExecutorKind::SingleThreadedxecutor);
-
         Self {
-            schedule: Schedule::default(),
-            startup,
             reflection_registry: ReflectionRegistry::default(),
             world: World::new(),
         }
@@ -159,7 +152,7 @@ impl Module {
 
     pub fn add_event<T: Event>(&mut self) -> &mut Self {
         self.world.init_resource::<Events<T>>();
-        self.schedule.add_systems(Events::<T>::update_system);
+        self.world.add_systems(Events::<T>::update_system);
         self
     }
 }

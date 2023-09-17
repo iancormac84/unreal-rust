@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use bevy_ecs::prelude::*;
 use unreal_api::api::UnrealApi;
-use unreal_api::core::{ActorHitEvent, Despawn};
+use unreal_api::core::{ActorHitEvent, Despawn, Startup, Update};
 use unreal_api::registry::USound;
 use unreal_api::sound::{play_sound_at_location, SoundSettings};
 use unreal_api::{
