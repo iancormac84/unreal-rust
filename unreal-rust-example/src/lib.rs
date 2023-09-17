@@ -332,22 +332,25 @@ impl UserModule for MyModule {
 
         module
             .add_plugin(MovementPlugin)
-            .add_startup_system_set(
-                SystemSet::new()
-                    .with_system(register_class_resource)
-                    .with_system(register_player_input)
-                    .with_system(register_hit_events),
+            .add_systems(
+                Startup,
+                (
+                    register_class_resource,
+                    register_player_input,
+                    register_hit_events,
+                ),
             )
-            .add_system_set_to_stage(
-                CoreStage::Update,
-                SystemSet::new()
-                    .with_system(spawn_class)
-                    .with_system(spawn_camera)
-                    .with_system(update_controller_view)
-                    .with_system(rotate_camera)
-                    .with_system(update_camera.after(rotate_camera))
-                    .with_system(toggle_camera)
-                    .with_system(play_sound_on_hit),
+            .add_systems(
+                Update,
+                (
+                    spawn_class,
+                    spawn_camera,
+                    update_controller_view,
+                    rotate_camera,
+                    update_camera.after(rotate_camera),
+                    toggle_camera,
+                    play_sound_on_hit,
+                ),
             );
     }
 }

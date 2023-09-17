@@ -1,10 +1,8 @@
-use bevy_ecs::prelude::*;
+use bevy_ecs::{prelude::*, schedule::ScheduleLabel, system::Command};
 use std::ffi::c_void;
 
 use std::panic;
 
-use bevy_ecs::schedule::{StageLabel, SystemSet};
-use bevy_ecs::system::Command;
 use ffi::{EventType, Quaternion, StrRustAlloc};
 use unreal_api::{module::ReflectionRegistry, Component};
 use unreal_reflect::{
@@ -45,34 +43,31 @@ impl Plugin for CorePlugin {
             .insert_resource(Time::default())
             .insert_resource(Input::default())
             .insert_resource(UnrealApi::default())
-            .add_stage(CoreStage::RegisterEvent)
-            .add_stage_after(CoreStage::RegisterEvent, CoreStage::PreUpdate)
-            .add_stage_after(CoreStage::PreUpdate, CoreStage::Update)
-            .add_stage_after(CoreStage::Update, CoreStage::PostUpdate)
+            .add_schedule(RegisterEvent)
+            .add_schedule(RegisterEvent CoreStage::PreUpdate)
+            .add_schedule(CoreStage::PreUpdate, CoreStage::Update)
+            .add_schedule(CoreStage::Update, CoreStage::PostUpdate)
             // TODO: Order matters here. Needs to be defined after the stages
             .add_event::<OnActorBeginOverlapEvent>()
             .add_event::<OnActorEndOverlapEvent>()
             .add_event::<ActorHitEvent>()
             .add_event::<ActorSpawnedEvent>()
             .add_event::<ActorDestroyEvent>()
-            .add_system_set_to_stage(
-                CoreStage::RegisterEvent,
-                SystemSet::new()
-                    .with_system(process_actor_spawned)
-                    .with_system(process_actor_destroyed),
+            .add_systems(
+                RegisterEvent,
+                (process_actor_spawned, process_actor_destroyed),
             )
-            .add_system_set_to_stage(
-                CoreStage::PreUpdate,
-                SystemSet::new()
-                    .with_system(update_input)
-                    .with_system(download_transform_from_unreal)
-                    .with_system(download_physics_from_unreal),
+            .add_systems(
+                PreUpdate,
+                (
+                    update_input,
+                    download_transform_from_unreal,
+                    download_physics_from_unreal,
+                ),
             )
-            .add_system_set_to_stage(
-                CoreStage::PostUpdate,
-                SystemSet::new()
-                    .with_system(upload_transform_to_unreal)
-                    .with_system(upload_physics_to_unreal),
+            .add_systems(
+                PostUpdate,
+                (upload_transform_to_unreal, upload_physics_to_unreal),
             );
     }
 }
@@ -519,17 +514,21 @@ pub fn register_core_components(registry: &mut ReflectionRegistry) {
     registry.register::<PhysicsComponent>();
 }
 
-#[derive(Debug, Hash, PartialEq, Eq, Clone, StageLabel)]
-pub struct StartupStage;
+#[derive(Debug, Hash, PartialEq, Eq, Clone, ScheduleLabel)]
+pub struct Startup;
 
-#[derive(Debug, Hash, PartialEq, Eq, Clone, StageLabel)]
-pub enum CoreStage {
-    Startup,
-    RegisterEvent,
-    PreUpdate,
-    Update,
-    PostUpdate,
-}
+#[derive(Debug, Hash, PartialEq, Eq, Clone, ScheduleLabel)]
+pub struct RegisterEvent;
+
+#[derive(Debug, Hash, PartialEq, Eq, Clone, ScheduleLabel)]
+pub struct PreUpdate;
+
+#[derive(Debug, Hash, PartialEq, Eq, Clone, ScheduleLabel)]
+pub struct Update;
+
+#[derive(Debug, Hash, PartialEq, Eq, Clone, ScheduleLabel)]
+pub struct PostUpdate;
+
 #[derive(Resource, Default, Debug, Copy, Clone)]
 pub struct Frame {
     pub dt: f32,
@@ -757,7 +756,7 @@ pub struct Despawn {
 }
 
 impl Command for Despawn {
-    fn write(self, world: &mut World) {
+    fn apply(self, world: &mut World) {
         world.despawn(self.entity);
         if let Some(mut api) = world.get_resource_mut::<UnrealApi>() {
             // If this entity had an actor, we will also remove it from the map. Otherwise

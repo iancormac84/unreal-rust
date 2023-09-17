@@ -491,15 +491,13 @@ impl Plugin for MovementPlugin {
             => module
         }
 
-        module.add_system_set_to_stage(
-            CoreStage::PostUpdate,
-            SystemSet::new().with_system(character_jump),
-        );
-        module.add_system_set_to_stage(
-            CoreStage::Update,
-            SystemSet::new()
-                .with_system(character_control_system)
-                .with_system(update_movement_component.after(character_control_system)),
+        module.add_systems(PostUpdate, character_jump);
+        module.add_systems(
+            Update,
+            (
+                character_control_system,
+                update_movement_component.after(character_control_system),
+            ),
         );
     }
 }

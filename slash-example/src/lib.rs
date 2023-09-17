@@ -373,27 +373,23 @@ impl UserModule for MyModule {
 
         module
             .add_plugin(MovementPlugin)
-            .add_startup_system_set(SystemSet::new().with_system(register_player_input))
-            .add_system_set_to_stage(
-                CoreStage::Update,
-                SystemSet::new()
-                    .with_system(weapon_start)
-                    .with_system(apply_weapon_forces.after(register_weapon))
-                    .with_system(player_attack)
-                    .with_system(update_cursor)
-                    .with_system(create_player)
-                    .with_system(spawn_camera)
-                    .with_system(rotate_camera)
-                    .with_system(update_camera.after(rotate_camera))
-                    .with_system(spawn_enemy_at_start)
-                    .with_system(update_controller_view.after(rotate_camera)),
+            .add_systems(Startup, register_player_input)
+            .add_systems(
+                Update,
+                (
+                    weapon_start,
+                    apply_weapon_forces.after(register_weapon),
+                    player_attack,
+                    update_cursor,
+                    create_player,
+                    spawn_camera,
+                    rotate_camera,
+                    update_camera.after(rotate_camera),
+                    spawn_enemy_at_start,
+                    update_controller_view.after(rotate_camera),
+                ),
             )
-            .add_system_set_to_stage(
-                CoreStage::PostUpdate,
-                SystemSet::new()
-                    .with_system(update_player_state)
-                    .with_system(register_weapon),
-            );
+            .add_systems(PostUpdate, (update_player_state, register_weapon));
     }
 }
 

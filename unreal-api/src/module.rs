@@ -3,13 +3,13 @@ use std::collections::{HashMap, HashSet};
 use bevy_ecs::{
     event::Event,
     prelude::{Events, System},
-    schedule::{Schedule, StageLabel, SystemSet, SystemStage},
+    schedule::{ExecutorKind, Schedule, ScheduleLabel},
     system::Resource,
 };
 use unreal_reflect::{registry::ReflectDyn, uuid, TypeUuid, World};
 
 use crate::{
-    core::{CoreStage, EntityEvent, SendEntityEvent, StartupStage, UnrealCore},
+    core::{EntityEvent, SendEntityEvent, UnrealCore},
     editor_component::AddSerializedComponent,
     ffi::UnrealBindings,
     plugin::Plugin,
@@ -100,8 +100,8 @@ pub struct Module {
 
 impl Module {
     pub fn new() -> Self {
-        let mut startup = Schedule::default();
-        startup.add_stage(StartupStage, SystemStage::single_threaded());
+        let mut startup =
+            Schedule::default().set_executor_kind(ExecutorKind::SingleThreadedxecutor);
 
         Self {
             schedule: Schedule::default(),
@@ -115,34 +115,8 @@ impl Module {
         self
     }
 
-    pub fn add_stage(&mut self, label: impl StageLabel) -> &mut Self {
-        self.schedule
-            .add_stage(label, SystemStage::single_threaded());
-        self
-    }
-
-    pub fn add_stage_after(
-        &mut self,
-        label: impl StageLabel,
-        insert: impl StageLabel,
-    ) -> &mut Self {
-        self.schedule
-            .add_stage_after(label, insert, SystemStage::single_threaded());
-        self
-    }
-
-    pub fn add_stage_before(
-        &mut self,
-        label: impl StageLabel,
-        insert: impl StageLabel,
-    ) -> &mut Self {
-        self.schedule
-            .add_stage_before(label, insert, SystemStage::single_threaded());
-        self
-    }
-
-    pub fn add_system_set_to_stage(&mut self, label: impl StageLabel, set: SystemSet) -> &mut Self {
-        self.schedule.add_system_set_to_stage(label, set);
+    pub fn add_schedule(&mut self, schedule: Schedule, label: impl ScheduleLabel) -> &mut Self {
+        self.world.add_schedule(schedule, label);
         self
     }
 
@@ -183,18 +157,9 @@ impl Module {
         self
     }
 
-    pub fn add_startup_system_set(&mut self, system_set: SystemSet) -> &mut Self {
-        self.startup
-            .add_system_set_to_stage(StartupStage, system_set);
-        self
-    }
-
     pub fn add_event<T: Event>(&mut self) -> &mut Self {
         self.world.init_resource::<Events<T>>();
-        self.add_system_set_to_stage(
-            CoreStage::RegisterEvent,
-            SystemSet::new().with_system(Events::<T>::update_system),
-        );
+        self.schedule.add_systems(Events::<T>::update_system);
         self
     }
 }
