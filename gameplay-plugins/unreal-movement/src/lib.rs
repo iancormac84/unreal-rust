@@ -1,8 +1,8 @@
-use bevy_ecs::{prelude::*, query::WorldQuery};
 use unreal_api::api::{SweepHit, SweepParams, UnrealApi};
 use unreal_api::core::EntityEvent;
+use unreal_api::ecs::{prelude::*, query::WorldQuery};
 use unreal_api::{
-    core::{ActorComponent, CoreStage, Frame, TransformComponent},
+    core::{ActorComponent, Frame, TransformComponent},
     ffi,
     input::Input,
     log::LogCategory,
@@ -10,14 +10,14 @@ use unreal_api::{
     module::Module,
     physics::PhysicsComponent,
     plugin::Plugin,
-    register_components,
+    register_components, PostUpdate, Update,
 };
-use unreal_api::{register_editor_components, register_events, Component, Event};
+use unreal_api::{register_editor_components, register_events, Component};
 fn project_onto_plane(dir: Vec3, normal: Vec3) -> Vec3 {
     dir - normal * Vec3::dot(dir, normal)
 }
 
-#[derive(Debug, Copy, Clone, Event, serde::Deserialize)]
+#[derive(Debug, Copy, Clone, bevy_ecs::event::Event, unreal_api::Event, serde::Deserialize)]
 #[uuid = "5464a09a-51f8-4a34-92dd-ef4c043108fa"]
 pub struct JumpCommand {}
 

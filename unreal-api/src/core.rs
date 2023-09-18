@@ -18,7 +18,7 @@ use crate::{
     api::UnrealApi,
     ffi::{self, AActorOpaque},
     input::Input,
-    main_schedule::{PostUpdate, PreUpdate, RegisterEvent},
+    main_schedule::{EventRegistration, PostUpdate, PreUpdate},
     math::{Quat, Vec3},
     module::{bindings, Module, UserModule},
     physics::PhysicsComponent,
@@ -51,7 +51,7 @@ impl Plugin for CorePlugin {
             .insert_resource(Time::default())
             .insert_resource(Input::default())
             .insert_resource(UnrealApi::default())
-            .add_schedule(Main, main_schedule)
+            .add_schedule(main_schedule, Main)
             .init_resource::<MainScheduleOrder>()
             .add_systems(Main, Main::run_main)
             // TODO: Order matters here. Needs to be defined after the stages
@@ -61,7 +61,7 @@ impl Plugin for CorePlugin {
             .add_event::<ActorSpawnedEvent>()
             .add_event::<ActorDestroyEvent>()
             .add_systems(
-                RegisterEvent,
+                EventRegistration,
                 (process_actor_spawned, process_actor_destroyed),
             )
             .add_systems(
@@ -90,7 +90,7 @@ impl UnrealCore {
     pub fn begin_play(&mut self, user_module: &dyn UserModule) {
         *self = Self::new(user_module);
 
-        self.module.startup.run_once(&mut self.module.world);
+        //self.module.startup.run_once(&mut self.module.world);
     }
     pub fn tick(&mut self, dt: f32) {
         if let Some(mut frame) = self.module.world.get_resource_mut::<Frame>() {
@@ -99,7 +99,7 @@ impl UnrealCore {
         if let Some(mut time) = self.module.world.get_resource_mut::<Time>() {
             time.time += dt as f64;
         }
-        self.module.schedule.run_once(&mut self.module.world);
+        //self.module.schedule.run_once(&mut self.module.world);
         //self.module.world.clear_trackers();
     }
 }
@@ -125,30 +125,36 @@ pub unsafe extern "C" fn retrieve_uuids(ptr: *mut ffi::Uuid, len: *mut usize) {
     }
 }
 
+#[derive(Event)]
 pub struct ActorSpawnedEvent {
     pub actor: ActorPtr,
 }
 
+#[derive(Event)]
 pub struct OnActorBeginOverlapEvent {
     pub overlapped_actor: ActorPtr,
     pub other: ActorPtr,
 }
 
+#[derive(Event)]
 pub struct OnActorEndOverlapEvent {
     pub overlapped_actor: ActorPtr,
     pub other: ActorPtr,
 }
 
+#[derive(Event)]
 pub struct ActorHitEvent {
     pub self_actor: ActorPtr,
     pub other: ActorPtr,
     pub normal_impulse: Vec3,
 }
 
+#[derive(Event)]
 pub struct ActorDestroyEvent {
     pub actor: ActorPtr,
 }
 
+#[derive(Event)]
 pub struct EntityEvent<E> {
     pub entity: Entity,
     pub event: E,

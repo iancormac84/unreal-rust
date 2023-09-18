@@ -5,12 +5,12 @@ use unreal_api::math::Vec2;
 use unreal_api::physics::PhysicsComponent;
 use unreal_api::registry::UClass;
 use unreal_api::{
-    core::{ActorComponent, ActorPtr, CoreStage, TransformComponent},
+    core::{ActorComponent, ActorPtr, TransformComponent},
     ffi::{self},
     input::Input,
     math::{Quat, Vec3},
     module::{bindings, InitUserModule, Module, UserModule},
-    register_components,
+    register_components, PostUpdate, Startup, Update,
 };
 use unreal_api::{register_editor_components, register_events, Component, Event};
 use unreal_movement::{
@@ -49,7 +49,7 @@ pub struct EnemySpawnerComponent {
     pub enemy: UClass,
 }
 
-#[derive(Debug, Event, serde::Deserialize)]
+#[derive(Debug, Event, bevy_ecs::event::Event, serde::Deserialize)]
 #[uuid = "479006cc-3c8f-4d16-b7c2-1bb81bcf43f2"]
 pub struct WeaponStartEvent {
     pub f: f32,

@@ -15,7 +15,7 @@ pub struct Startup;
 /// The schedule that runs once after [`Startup`].
 /// This is run by the [`Main`] schedule.
 #[derive(ScheduleLabel, Clone, Debug, PartialEq, Eq, Hash)]
-pub struct RegisterEvent;
+pub struct EventRegistration;
 
 /// The schedule that contains logic that must run before [`Update`]. For example, a system that reads raw keyboard
 /// input OS events into an `Events` resource. This enables systems in [`Update`] to consume the events from the `Events`
@@ -77,7 +77,7 @@ impl Main {
     pub fn run_main(world: &mut World, mut run_at_least_once: Local<bool>) {
         if !*run_at_least_once {
             let _ = world.try_run_schedule(Startup);
-            let _ = world.try_run_schedule(RegisterEvent);
+            let _ = world.try_run_schedule(EventRegistration);
             *run_at_least_once = true;
         }
 

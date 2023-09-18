@@ -1,10 +1,11 @@
 use std::collections::{HashMap, HashSet};
 
-use bevy_ecs::{
+use crate::ecs::{
     event::Event,
     prelude::{Events, System},
-    schedule::{Schedule, ScheduleLabel},
+    schedule::{IntoSystemConfigs, Schedule, ScheduleLabel, Schedules},
     system::Resource,
+    world::FromWorld,
 };
 use unreal_reflect::{registry::ReflectDyn, uuid, TypeUuid, World};
 
@@ -12,6 +13,7 @@ use crate::{
     core::{EntityEvent, SendEntityEvent, UnrealCore},
     editor_component::AddSerializedComponent,
     ffi::UnrealBindings,
+    main_schedule::EventRegistration,
     plugin::Plugin,
 };
 
@@ -108,6 +110,29 @@ impl Module {
         self
     }
 
+    pub fn init_resource<R: Resource + FromWorld>(&mut self) -> &mut Self {
+        self.world.init_resource::<R>();
+        self
+    }
+
+    pub fn add_systems<M>(
+        &mut self,
+        schedule: impl ScheduleLabel,
+        systems: impl IntoSystemConfigs<M>,
+    ) -> &mut Self {
+        let mut schedules = self.world.resource_mut::<Schedules>();
+
+        if let Some(schedule) = schedules.get_mut(&schedule) {
+            schedule.add_systems(systems);
+        } else {
+            let mut new_schedule = Schedule::new();
+            new_schedule.add_systems(systems);
+            schedules.insert(schedule, new_schedule);
+        }
+
+        self
+    }
+
     pub fn add_schedule(&mut self, schedule: Schedule, label: impl ScheduleLabel) -> &mut Self {
         self.world.add_schedule(schedule, label);
         self
@@ -135,7 +160,7 @@ impl Module {
 
     pub fn register_event<T>(&mut self)
     where
-        T: RegisterReflection + RegisterEvent + TypeUuid + Send + Sync + 'static,
+        T: RegisterReflection + RegisterEvent + Event + TypeUuid + Send + Sync + 'static,
     {
         self.reflection_registry.uuid_set.insert(T::TYPE_UUID);
         T::register_event(&mut self.reflection_registry);
@@ -151,8 +176,10 @@ impl Module {
     }
 
     pub fn add_event<T: Event>(&mut self) -> &mut Self {
-        self.world.init_resource::<Events<T>>();
-        self.world.add_systems(Events::<T>::update_system);
+        if !self.world.contains_resource::<Events<T>>() {
+            self.init_resource::<Events<T>>()
+                .add_systems(EventRegistration, Events::<T>::update_system);
+        }
         self
     }
 }
