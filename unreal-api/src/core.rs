@@ -23,7 +23,7 @@ use crate::{
     module::{bindings, Module, UserModule},
     physics::PhysicsComponent,
     plugin::Plugin,
-    register_components,
+    register_components, Startup,
 };
 
 pub struct UnrealCore {
@@ -90,7 +90,7 @@ impl UnrealCore {
     pub fn begin_play(&mut self, user_module: &dyn UserModule) {
         *self = Self::new(user_module);
 
-        //self.module.startup.run_once(&mut self.module.world);
+        self.module.world.run_schedule(Startup);
     }
     pub fn tick(&mut self, dt: f32) {
         if let Some(mut frame) = self.module.world.get_resource_mut::<Frame>() {
@@ -99,7 +99,7 @@ impl UnrealCore {
         if let Some(mut time) = self.module.world.get_resource_mut::<Time>() {
             time.time += dt as f64;
         }
-        //self.module.schedule.run_once(&mut self.module.world);
+        self.module.world.run_schedule(Main);
         //self.module.world.clear_trackers();
     }
 }
