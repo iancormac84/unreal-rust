@@ -55,7 +55,7 @@ pub struct MainScheduleOrder {
 impl Default for MainScheduleOrder {
     fn default() -> Self {
         Self {
-            labels: vec![Box::new(PreUpdate), Box::new(Update), Box::new(PostUpdate)],
+            labels: vec![Box::new(EventRegistration), Box::new(PreUpdate), Box::new(Update), Box::new(PostUpdate)],
         }
     }
 }
@@ -77,7 +77,6 @@ impl Main {
     pub fn run_main(world: &mut World, mut run_at_least_once: Local<bool>) {
         if !*run_at_least_once {
             let _ = world.try_run_schedule(Startup);
-            let _ = world.try_run_schedule(EventRegistration);
             *run_at_least_once = true;
         }
 
