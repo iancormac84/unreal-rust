@@ -4,7 +4,7 @@ use bevy_ecs::prelude::*;
 use unreal_api::{
     api::UnrealApi,
     core::{ActorComponent, ActorHitEvent, ActorPtr, Despawn, ParentComponent, TransformComponent},
-    ffi::{self, UClassOpague},
+    ffi::{self, UClassOpaque},
     input::Input,
     math::{Quat, Vec3},
     module::{bindings, InitUserModule, Module, UserModule},
@@ -35,7 +35,7 @@ impl Class {
 
 #[derive(Resource, Default)]
 pub struct ClassesResource {
-    classes: HashMap<*mut ffi::UClassOpague, Class>,
+    classes: HashMap<*mut ffi::UClassOpaque, Class>,
 }
 unsafe impl Send for ClassesResource {}
 unsafe impl Sync for ClassesResource {}
@@ -99,7 +99,7 @@ fn register_class_resource(mut commands: Commands) {
     unsafe {
         (bindings().actor_fns.get_registered_classes)(std::ptr::null_mut(), &mut len);
     }
-    let mut classes: Vec<*mut UClassOpague> = Vec::with_capacity(len);
+    let mut classes: Vec<*mut UClassOpaque> = Vec::with_capacity(len);
     unsafe {
         (bindings().actor_fns.get_registered_classes)(classes.as_mut_ptr(), &mut len);
         classes.set_len(len);

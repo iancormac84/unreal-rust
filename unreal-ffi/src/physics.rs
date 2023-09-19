@@ -1,4 +1,4 @@
-use crate::{AActorOpaque, Quaternion, UPrimtiveOpaque, Vector3};
+use crate::{AActorOpaque, Quaternion, UPrimitiveOpaque, Vector3};
 
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -65,14 +65,14 @@ pub struct LineTraceParams {
 #[derive(Debug)]
 pub struct OverlapResult {
     pub actor: *mut AActorOpaque,
-    pub primtive: *mut UPrimtiveOpaque,
+    pub primitive: *mut UPrimitiveOpaque,
 }
 
 impl Default for OverlapResult {
     fn default() -> Self {
         Self {
             actor: std::ptr::null_mut(),
-            primtive: std::ptr::null_mut(),
+            primitive: std::ptr::null_mut(),
         }
     }
 }
@@ -81,7 +81,7 @@ impl Default for OverlapResult {
 #[derive(Debug)]
 pub struct HitResult {
     pub actor: *mut AActorOpaque,
-    pub primtive: *mut UPrimtiveOpaque,
+    pub primitive: *mut UPrimitiveOpaque,
     pub distance: f32,
     pub normal: Vector3,
     pub location: Vector3,
@@ -95,7 +95,7 @@ impl Default for HitResult {
     fn default() -> Self {
         Self {
             actor: std::ptr::null_mut(),
-            primtive: std::ptr::null_mut(),
+            primitive: std::ptr::null_mut(),
             distance: Default::default(),
             normal: Default::default(),
             location: Default::default(),
@@ -107,15 +107,15 @@ impl Default for HitResult {
     }
 }
 
-pub type GetVelocityFn = unsafe extern "C" fn(primitive: *const UPrimtiveOpaque) -> Vector3;
+pub type GetVelocityFn = unsafe extern "C" fn(primitive: *const UPrimitiveOpaque) -> Vector3;
 
-pub type SetVelocityFn = unsafe extern "C" fn(primitive: *mut UPrimtiveOpaque, velocity: Vector3);
+pub type SetVelocityFn = unsafe extern "C" fn(primitive: *mut UPrimitiveOpaque, velocity: Vector3);
 
-pub type IsSimulatingFn = unsafe extern "C" fn(primitive: *const UPrimtiveOpaque) -> u32;
+pub type IsSimulatingFn = unsafe extern "C" fn(primitive: *const UPrimitiveOpaque) -> u32;
 
-pub type AddForceFn = unsafe extern "C" fn(actor: *mut UPrimtiveOpaque, force: Vector3);
+pub type AddForceFn = unsafe extern "C" fn(actor: *mut UPrimitiveOpaque, force: Vector3);
 
-pub type AddImpulseFn = unsafe extern "C" fn(actor: *mut UPrimtiveOpaque, force: Vector3);
+pub type AddImpulseFn = unsafe extern "C" fn(actor: *mut UPrimitiveOpaque, force: Vector3);
 
 pub type LineTraceFn = unsafe extern "C" fn(
     start: Vector3,
@@ -124,7 +124,7 @@ pub type LineTraceFn = unsafe extern "C" fn(
     result: &mut HitResult,
 ) -> u32;
 pub type GetBoundingBoxExtentFn =
-    unsafe extern "C" fn(primitive: *const UPrimtiveOpaque) -> Vector3;
+    unsafe extern "C" fn(primitive: *const UPrimitiveOpaque) -> Vector3;
 
 pub type SweepFn = unsafe extern "C" fn(
     start: Vector3,
@@ -145,7 +145,7 @@ pub type OverlapMultiFn = unsafe extern "C" fn(
 ) -> u32;
 
 pub type GetCollisionShapeFn =
-    unsafe extern "C" fn(primitive: *const UPrimtiveOpaque, shape: *mut CollisionShape) -> u32;
+    unsafe extern "C" fn(primitive: *const UPrimitiveOpaque, shape: *mut CollisionShape) -> u32;
 
 pub type SweepMultiFn = unsafe extern "C" fn(
     start: Vector3,
@@ -158,15 +158,15 @@ pub type SweepMultiFn = unsafe extern "C" fn(
 ) -> u32;
 
 extern "C" {
-    pub fn GetVelocity(primitive: *const UPrimtiveOpaque) -> Vector3;
+    pub fn GetVelocity(primitive: *const UPrimitiveOpaque) -> Vector3;
 
-    pub fn SetVelocity(primitive: *mut UPrimtiveOpaque, velocity: Vector3);
+    pub fn SetVelocity(primitive: *mut UPrimitiveOpaque, velocity: Vector3);
 
-    pub fn IsSimulating(primitive: *const UPrimtiveOpaque) -> u32;
+    pub fn IsSimulating(primitive: *const UPrimitiveOpaque) -> u32;
 
-    pub fn AddForce(actor: *mut UPrimtiveOpaque, force: Vector3);
+    pub fn AddForce(actor: *mut UPrimitiveOpaque, force: Vector3);
 
-    pub fn AddImpulse(actor: *mut UPrimtiveOpaque, force: Vector3);
+    pub fn AddImpulse(actor: *mut UPrimitiveOpaque, force: Vector3);
 
     pub fn LineTrace(
         start: Vector3,
@@ -175,7 +175,7 @@ extern "C" {
         result: &mut HitResult,
     ) -> u32;
 
-    pub fn GetBoundingBoxExtent(primitive: *const UPrimtiveOpaque) -> Vector3;
+    pub fn GetBoundingBoxExtent(primitive: *const UPrimitiveOpaque) -> Vector3;
 
     pub fn Sweep(
         start: Vector3,
@@ -205,7 +205,7 @@ extern "C" {
         result: *mut OverlapResult,
     ) -> u32;
 
-    pub fn GetCollisionShape(primitive: *const UPrimtiveOpaque, shape: *mut CollisionShape) -> u32;
+    pub fn GetCollisionShape(primitive: *const UPrimitiveOpaque, shape: *mut CollisionShape) -> u32;
 }
 
 #[repr(C)]

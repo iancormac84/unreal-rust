@@ -852,7 +852,7 @@ fn process_actor_spawned(
 
                 if !root_component.is_null() {
                     let is_primitive =
-                        (bindings().is_a)(root_component, ffi::UObjectType::UPrimtiveComponent)
+                        (bindings().is_a)(root_component, ffi::UObjectType::UPrimitiveComponent)
                             == 1;
 
                     if is_primitive {

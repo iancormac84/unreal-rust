@@ -7,7 +7,7 @@ use unreal_ffi as ffi;
 
 #[derive(Copy, Clone, Debug)]
 pub struct UClass {
-    pub ptr: *mut ffi::UClassOpague,
+    pub ptr: *mut ffi::UClassOpaque,
 }
 unsafe impl Send for UClass {}
 unsafe impl Sync for UClass {}
@@ -41,7 +41,7 @@ impl<'de> Visitor<'de> for StrVisitor {
 
 #[derive(Copy, Clone, Debug)]
 pub struct USound {
-    pub ptr: *mut ffi::UObjectOpague,
+    pub ptr: *mut ffi::UObjectOpaque,
 }
 unsafe impl Send for USound {}
 unsafe impl Sync for USound {}

@@ -1,4 +1,4 @@
-use crate::{Quaternion, USoundBaseOpague, Vector3};
+use crate::{Quaternion, USoundBaseOpaque, Vector3};
 
 #[repr(C)]
 pub struct SoundSettings {
@@ -16,14 +16,14 @@ impl Default for SoundSettings {
 
 extern "C" {
     pub fn PlaySoundAtLocation(
-        sound: *const USoundBaseOpague,
+        sound: *const USoundBaseOpaque,
         location: Vector3,
         rotation: Quaternion,
         settings: *const SoundSettings,
     );
 }
 pub type PlaySoundAtLocationFn = unsafe extern "C" fn(
-    sound: *const USoundBaseOpague,
+    sound: *const USoundBaseOpaque,
     location: Vector3,
     rotation: Quaternion,
     settings: *const SoundSettings,

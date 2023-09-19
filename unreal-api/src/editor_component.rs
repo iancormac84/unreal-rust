@@ -114,7 +114,7 @@ impl GetEditorComponentValue for UClass {
         uuid: Uuid,
         field: &'static str,
     ) -> Option<Self> {
-        let mut data: *mut ffi::UObjectOpague = std::ptr::null_mut();
+        let mut data: *mut ffi::UObjectOpaque = std::ptr::null_mut();
         let code = (bindings().editor_component_fns.get_editor_component_uobject)(
             actor,
             to_ffi_uuid(uuid),
@@ -136,7 +136,7 @@ impl GetEditorComponentValue for USound {
         uuid: Uuid,
         field: &'static str,
     ) -> Option<Self> {
-        let mut data: *mut ffi::UObjectOpague = std::ptr::null_mut();
+        let mut data: *mut ffi::UObjectOpaque = std::ptr::null_mut();
         let code = (bindings().editor_component_fns.get_editor_component_uobject)(
             actor,
             to_ffi_uuid(uuid),

@@ -2,7 +2,7 @@ use std::os::raw::c_char;
 
 use crate::{
     AActorOpaque, ActorComponentPtr, ActorSpawnOptions, Entity, Quaternion, RustAlloc,
-    UClassOpague, USceneComponentOpague, UnrealTransform, Vector3,
+    UClassOpaque, USceneComponentOpaque, UnrealTransform, Vector3,
 };
 
 pub type GetSpatialDataFn = extern "C" fn(
@@ -27,12 +27,12 @@ pub type GetActorComponentsFn =
     unsafe extern "C" fn(actor: *const AActorOpaque, data: *mut ActorComponentPtr, len: &mut usize);
 
 pub type GetRootComponentFn =
-    unsafe extern "C" fn(actor: *const AActorOpaque, data: *mut *mut USceneComponentOpague);
+    unsafe extern "C" fn(actor: *const AActorOpaque, data: *mut *mut USceneComponentOpaque);
 
 pub type GetRegisteredClassesFn =
-    unsafe extern "C" fn(classes: *mut *mut UClassOpague, len: *mut usize);
+    unsafe extern "C" fn(classes: *mut *mut UClassOpaque, len: *mut usize);
 
-pub type GetClassFn = unsafe extern "C" fn(actor: *const AActorOpaque) -> *mut UClassOpague;
+pub type GetClassFn = unsafe extern "C" fn(actor: *const AActorOpaque) -> *mut UClassOpaque;
 
 pub type IsMoveableFn = unsafe extern "C" fn(actor: *const AActorOpaque) -> u32;
 
@@ -52,7 +52,7 @@ pub type GetParentActorFn =
     unsafe extern "C" fn(actor: *const AActorOpaque, parent: *mut *mut AActorOpaque) -> u32;
 
 pub type SpawnActorWithClassFn = unsafe extern "C" fn(
-    actor_class: *const UClassOpague,
+    actor_class: *const UClassOpaque,
     transform: UnrealTransform,
     options: ActorSpawnOptions,
     out: *mut *mut AActorOpaque,
@@ -85,11 +85,11 @@ extern "C" {
         len: &mut usize,
     );
 
-    pub fn GetRootComponent(actor: *const AActorOpaque, data: *mut *mut USceneComponentOpague);
+    pub fn GetRootComponent(actor: *const AActorOpaque, data: *mut *mut USceneComponentOpaque);
 
-    pub fn GetRegisteredClasses(classes: *mut *mut UClassOpague, len: *mut usize);
+    pub fn GetRegisteredClasses(classes: *mut *mut UClassOpaque, len: *mut usize);
 
-    pub fn GetClass(actor: *const AActorOpaque) -> *mut UClassOpague;
+    pub fn GetClass(actor: *const AActorOpaque) -> *mut UClassOpaque;
 
     pub fn IsMoveable(actor: *const AActorOpaque) -> u32;
 
@@ -102,7 +102,7 @@ extern "C" {
     pub fn GetParentActor(actor: *const AActorOpaque, parent: *mut *mut AActorOpaque) -> u32;
 
     pub fn SpawnActorWithClass(
-        actor_class: *const UClassOpague,
+        actor_class: *const UClassOpaque,
         transform: UnrealTransform,
         options: ActorSpawnOptions,
         out: *mut *mut AActorOpaque,

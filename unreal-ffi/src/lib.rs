@@ -23,7 +23,7 @@ pub enum ResultCode {
 pub enum UObjectType {
     UClass,
     USceneComponent,
-    UPrimtiveComponent,
+    UPrimitiveComponent,
 }
 
 #[repr(C)]
@@ -171,12 +171,12 @@ impl From<Vec3> for Vector3 {
 // TODO: Is there a more typesafe way of defining an opaque type that
 // is c ffi safe in Rust without nightly?
 pub type AActorOpaque = c_void;
-pub type UPrimtiveOpaque = c_void;
+pub type UPrimitiveOpaque = c_void;
 pub type UCapsuleOpaque = c_void;
-pub type UClassOpague = c_void;
-pub type UObjectOpague = c_void;
-pub type USoundBaseOpague = c_void;
-pub type USceneComponentOpague = c_void;
+pub type UClassOpaque = c_void;
+pub type UObjectOpaque = c_void;
+pub type USoundBaseOpaque = c_void;
+pub type USceneComponentOpaque = c_void;
 
 pub type LogFn = unsafe extern "C" fn(message: Utf8Str);
 pub type IterateActorsFn = unsafe extern "C" fn(array: *mut *mut AActorOpaque, len: *mut u64);
@@ -210,10 +210,10 @@ pub type VisualLogLocationFn = unsafe extern "C" fn(
     color: Color,
 );
 
-pub type IsAFn = unsafe extern "C" fn(object: *mut UObjectOpague, ty: UObjectType) -> u32;
+pub type IsAFn = unsafe extern "C" fn(object: *mut UObjectOpaque, ty: UObjectType) -> u32;
 
 extern "C" {
-    pub fn IsA(object: *mut UObjectOpague, ty: UObjectType) -> u32;
+    pub fn IsA(object: *mut UObjectOpaque, ty: UObjectType) -> u32;
     pub fn TickActor(actor: *mut AActorOpaque, dt: f32);
     pub fn Log(message: Utf8Str);
     pub fn IterateActors(array: *mut *mut AActorOpaque, len: *mut u64);
@@ -519,7 +519,7 @@ extern "C" {
         uuid: Uuid,
         field: Utf8Str,
         ty: UObjectType,
-        out: *mut *mut UObjectOpague,
+        out: *mut *mut UObjectOpaque,
     ) -> u32;
     pub fn GetSerializedJsonComponent(
         actor: *const AActorOpaque,
@@ -564,7 +564,7 @@ pub type GetEditorComponentUObjectFn = unsafe extern "C" fn(
     uuid: Uuid,
     field: Utf8Str,
     ty: UObjectType,
-    out: *mut *mut UObjectOpague,
+    out: *mut *mut UObjectOpaque,
 ) -> u32;
 
 pub type GetSerializedJsonComponentFn =

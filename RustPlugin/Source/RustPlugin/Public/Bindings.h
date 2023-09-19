@@ -65,10 +65,10 @@ enum class ResultCode : uint8_t {
 enum class UObjectType : uint32_t {
   UClass,
   USceneComponent,
-  UPrimtiveComponent,
+  UPrimitiveComponent,
 };
 
-using UObjectOpague = void;
+using UObjectOpaque = void;
 
 using AActorOpaque = void;
 
@@ -123,9 +123,9 @@ struct ActorComponentPtr {
   void *ptr;
 };
 
-using USceneComponentOpague = void;
+using USceneComponentOpaque = void;
 
-using UClassOpague = void;
+using UClassOpaque = void;
 
 struct UnrealTransform {
   Vector3 position;
@@ -137,7 +137,7 @@ struct ActorSpawnOptions {
   ActorPivot actor_pivot;
 };
 
-using UPrimtiveOpaque = void;
+using UPrimitiveOpaque = void;
 
 struct LineTraceParams {
   AActorOpaque *const *ignored_actors;
@@ -146,7 +146,7 @@ struct LineTraceParams {
 
 struct HitResult {
   AActorOpaque *actor;
-  UPrimtiveOpaque *primtive;
+  UPrimitiveOpaque *primitive;
   float distance;
   Vector3 normal;
   Vector3 location;
@@ -184,10 +184,10 @@ struct CollisionShape {
 
 struct OverlapResult {
   AActorOpaque *actor;
-  UPrimtiveOpaque *primtive;
+  UPrimitiveOpaque *primitive;
 };
 
-using USoundBaseOpague = void;
+using USoundBaseOpaque = void;
 
 struct SoundSettings {
   float volume;
@@ -216,11 +216,11 @@ using RegisterActorOnOverlapFn = void(*)(AActorOpaque *actor);
 
 using RegisterActorOnHitFn = void(*)(AActorOpaque *actor);
 
-using GetRootComponentFn = void(*)(const AActorOpaque *actor, USceneComponentOpague **data);
+using GetRootComponentFn = void(*)(const AActorOpaque *actor, USceneComponentOpaque **data);
 
-using GetRegisteredClassesFn = void(*)(UClassOpague **classes, uintptr_t *len);
+using GetRegisteredClassesFn = void(*)(UClassOpaque **classes, uintptr_t *len);
 
-using GetClassFn = UClassOpague*(*)(const AActorOpaque *actor);
+using GetClassFn = UClassOpaque*(*)(const AActorOpaque *actor);
 
 using SetViewTargetFn = void(*)(const AActorOpaque *actor);
 
@@ -234,7 +234,7 @@ using DestroyActorFn = void(*)(const AActorOpaque *actor);
 
 using GetParentActorFn = uint32_t(*)(const AActorOpaque *actor, AActorOpaque **parent);
 
-using SpawnActorWithClassFn = uint32_t(*)(const UClassOpague *actor_class,
+using SpawnActorWithClassFn = uint32_t(*)(const UClassOpaque *actor_class,
                                           UnrealTransform transform,
                                           ActorSpawnOptions options,
                                           AActorOpaque **out);
@@ -258,22 +258,22 @@ struct ActorFns {
   SpawnActorWithClassFn spawn_actor_with_class;
 };
 
-using GetVelocityFn = Vector3(*)(const UPrimtiveOpaque *primitive);
+using GetVelocityFn = Vector3(*)(const UPrimitiveOpaque *primitive);
 
-using SetVelocityFn = void(*)(UPrimtiveOpaque *primitive, Vector3 velocity);
+using SetVelocityFn = void(*)(UPrimitiveOpaque *primitive, Vector3 velocity);
 
-using IsSimulatingFn = uint32_t(*)(const UPrimtiveOpaque *primitive);
+using IsSimulatingFn = uint32_t(*)(const UPrimitiveOpaque *primitive);
 
-using AddForceFn = void(*)(UPrimtiveOpaque *actor, Vector3 force);
+using AddForceFn = void(*)(UPrimitiveOpaque *actor, Vector3 force);
 
-using AddImpulseFn = void(*)(UPrimtiveOpaque *actor, Vector3 force);
+using AddImpulseFn = void(*)(UPrimitiveOpaque *actor, Vector3 force);
 
 using LineTraceFn = uint32_t(*)(Vector3 start,
                                 Vector3 end,
                                 LineTraceParams params,
                                 HitResult *result);
 
-using GetBoundingBoxExtentFn = Vector3(*)(const UPrimtiveOpaque *primitive);
+using GetBoundingBoxExtentFn = Vector3(*)(const UPrimitiveOpaque *primitive);
 
 using SweepFn = uint32_t(*)(Vector3 start,
                             Vector3 end,
@@ -297,7 +297,7 @@ using OverlapMultiFn = uint32_t(*)(CollisionShape collision_shape,
                                    uintptr_t max_results,
                                    OverlapResult *result);
 
-using GetCollisionShapeFn = uint32_t(*)(const UPrimtiveOpaque *primitive, CollisionShape *shape);
+using GetCollisionShapeFn = uint32_t(*)(const UPrimitiveOpaque *primitive, CollisionShape *shape);
 
 struct PhysicsFns {
   GetVelocityFn get_velocity;
@@ -373,7 +373,7 @@ using GetEditorComponentUObjectFn = uint32_t(*)(const AActorOpaque *actor,
                                                 Uuid uuid,
                                                 Utf8Str field,
                                                 UObjectType ty,
-                                                UObjectOpague **out);
+                                                UObjectOpaque **out);
 
 using GetSerializedJsonComponentFn = uint32_t(*)(const AActorOpaque *actor,
                                                  Uuid uuid,
@@ -389,7 +389,7 @@ struct EditorComponentFns {
   GetSerializedJsonComponentFn get_serialized_json_component;
 };
 
-using PlaySoundAtLocationFn = void(*)(const USoundBaseOpague *sound,
+using PlaySoundAtLocationFn = void(*)(const USoundBaseOpaque *sound,
                                       Vector3 location,
                                       Quaternion rotation,
                                       const SoundSettings *settings);
@@ -410,7 +410,7 @@ struct ViewportFns {
   GetMousePositionFn get_mouse_position;
 };
 
-using IsAFn = uint32_t(*)(UObjectOpague *object, UObjectType ty);
+using IsAFn = uint32_t(*)(UObjectOpaque *object, UObjectType ty);
 
 struct UnrealBindings {
   ActorFns actor_fns;
@@ -526,7 +526,7 @@ struct ActorDestroyEvent {
 
 extern "C" {
 
-extern uint32_t IsA(UObjectOpague *object, UObjectType ty);
+extern uint32_t IsA(UObjectOpaque *object, UObjectType ty);
 
 extern void TickActor(AActorOpaque *actor, float dt);
 
@@ -587,7 +587,7 @@ extern uint32_t GetEditorComponentUObject(const AActorOpaque *actor,
                                           Uuid uuid,
                                           Utf8Str field,
                                           UObjectType ty,
-                                          UObjectOpague **out);
+                                          UObjectOpaque **out);
 
 extern uint32_t GetSerializedJsonComponent(const AActorOpaque *actor, Uuid uuid, StrRustAlloc *out);
 
@@ -611,11 +611,11 @@ extern void SetEntityForActor(AActorOpaque *name, Entity entity);
 
 extern void GetActorComponents(const AActorOpaque *actor, ActorComponentPtr *data, uintptr_t *len);
 
-extern void GetRootComponent(const AActorOpaque *actor, USceneComponentOpague **data);
+extern void GetRootComponent(const AActorOpaque *actor, USceneComponentOpaque **data);
 
-extern void GetRegisteredClasses(UClassOpague **classes, uintptr_t *len);
+extern void GetRegisteredClasses(UClassOpaque **classes, uintptr_t *len);
 
-extern UClassOpague *GetClass(const AActorOpaque *actor);
+extern UClassOpaque *GetClass(const AActorOpaque *actor);
 
 extern uint32_t IsMoveable(const AActorOpaque *actor);
 
@@ -627,24 +627,24 @@ extern void SetViewTarget(const AActorOpaque *actor);
 
 extern uint32_t GetParentActor(const AActorOpaque *actor, AActorOpaque **parent);
 
-extern uint32_t SpawnActorWithClass(const UClassOpague *actor_class,
+extern uint32_t SpawnActorWithClass(const UClassOpaque *actor_class,
                                     UnrealTransform transform,
                                     ActorSpawnOptions options,
                                     AActorOpaque **out);
 
-extern Vector3 GetVelocity(const UPrimtiveOpaque *primitive);
+extern Vector3 GetVelocity(const UPrimitiveOpaque *primitive);
 
-extern void SetVelocity(UPrimtiveOpaque *primitive, Vector3 velocity);
+extern void SetVelocity(UPrimitiveOpaque *primitive, Vector3 velocity);
 
-extern uint32_t IsSimulating(const UPrimtiveOpaque *primitive);
+extern uint32_t IsSimulating(const UPrimitiveOpaque *primitive);
 
-extern void AddForce(UPrimtiveOpaque *actor, Vector3 force);
+extern void AddForce(UPrimitiveOpaque *actor, Vector3 force);
 
-extern void AddImpulse(UPrimtiveOpaque *actor, Vector3 force);
+extern void AddImpulse(UPrimitiveOpaque *actor, Vector3 force);
 
 extern uint32_t LineTrace(Vector3 start, Vector3 end, LineTraceParams params, HitResult *result);
 
-extern Vector3 GetBoundingBoxExtent(const UPrimtiveOpaque *primitive);
+extern Vector3 GetBoundingBoxExtent(const UPrimitiveOpaque *primitive);
 
 extern uint32_t Sweep(Vector3 start,
                       Vector3 end,
@@ -668,9 +668,9 @@ extern uint32_t OverlapMulti(CollisionShape collision_shape,
                              uintptr_t max_results,
                              OverlapResult *result);
 
-extern uint32_t GetCollisionShape(const UPrimtiveOpaque *primitive, CollisionShape *shape);
+extern uint32_t GetCollisionShape(const UPrimitiveOpaque *primitive, CollisionShape *shape);
 
-extern void PlaySoundAtLocation(const USoundBaseOpague *sound,
+extern void PlaySoundAtLocation(const USoundBaseOpaque *sound,
                                 Vector3 location,
                                 Quaternion rotation,
                                 const SoundSettings *settings);
