@@ -121,7 +121,7 @@ void SetEntityForActor(AActorOpaque* actor, Entity entity)
 	}
 }
 
-uint32_t SpawnActorWithClass(const UClassOpague* actor_class, UnrealTransform transform, ActorSpawnOptions options,
+uint32_t SpawnActorWithClass(const UClassOpaque* actor_class, UnrealTransform transform, ActorSpawnOptions options,
                              AActorOpaque** out)
 {
 	// HACK: We want to know where the pivot point is before we spawn the actor but that is not easily possible. The
@@ -266,27 +266,27 @@ void GetActorComponents(const AActorOpaque* actor, ActorComponentPtr* data, uint
 	}
 }
 
-void AddForce(UPrimtiveOpaque* actor, Vector3 force)
+void AddForce(UPrimitiveOpaque* actor, Vector3 force)
 {
 	static_cast<UPrimitiveComponent*>(actor)->AddForce(ToFVector(force), FName{}, false);
 }
 
-void AddImpulse(UPrimtiveOpaque* actor, Vector3 force)
+void AddImpulse(UPrimitiveOpaque* actor, Vector3 force)
 {
 	static_cast<UPrimitiveComponent*>(actor)->AddImpulse(ToFVector(force), FName{}, false);
 }
 
-uint32_t IsSimulating(const UPrimtiveOpaque* primitive)
+uint32_t IsSimulating(const UPrimitiveOpaque* primitive)
 {
 	return ((UPrimitiveComponent*)primitive)->IsSimulatingPhysics(FName{});
 }
 
-Vector3 GetVelocity(const UPrimtiveOpaque* primitive)
+Vector3 GetVelocity(const UPrimitiveOpaque* primitive)
 {
 	return ToVector3(((UPrimitiveComponent*)primitive)->GetComponentVelocity());
 }
 
-void SetVelocity(UPrimtiveOpaque* primitive, Vector3 velocity)
+void SetVelocity(UPrimitiveOpaque* primitive, Vector3 velocity)
 {
 	((UPrimitiveComponent*)primitive)->SetPhysicsLinearVelocity(ToFVector(velocity), false, FName{});
 }
@@ -304,12 +304,12 @@ uint32_t LineTrace(Vector3 start, Vector3 end, LineTraceParams Params, HitResult
 	if (IsHit)
 	{
 		result->actor = (AActorOpaque*)Out.GetActor();
-		result->primtive = (UPrimtiveOpaque*)Out.GetComponent();
+		result->primitive = (UPrimitiveOpaque*)Out.GetComponent();
 		result->distance = Out.Distance;
 		result->location = ToVector3(Out.Location);
 		result->normal = ToVector3(Out.Normal);
 		result->impact_location = ToVector3(Out.ImpactPoint);
-		result->pentration_depth = Out.PenetrationDepth;
+		result->penetration_depth = Out.PenetrationDepth;
 	}
 
 	return IsHit;
@@ -343,7 +343,7 @@ uint32_t OverlapMulti(CollisionShape shape,
 			OverlapResult* result = &results[i];
 			FOverlapResult* Hit = &Out[i];
 			result->actor = (AActorOpaque*)Hit->GetActor();
-			result->primtive = (UPrimtiveOpaque*)Hit->GetComponent();
+			result->primitive = (UPrimitiveOpaque*)Hit->GetComponent();
 		}
 	}
 
@@ -371,12 +371,12 @@ void VisualLogCapsule(
 	                ToFColor(color), TEXT(""));
 }
 
-void GetRootComponent(const AActorOpaque* actor, USceneComponentOpague** data)
+void GetRootComponent(const AActorOpaque* actor, USceneComponentOpaque** data)
 {
-	*data = static_cast<USceneComponentOpague*>(ToAActor(actor)->GetRootComponent());
+	*data = static_cast<USceneComponentOpaque*>(ToAActor(actor)->GetRootComponent());
 }
 
-Vector3 GetBoundingBoxExtent(const UPrimtiveOpaque* primitive)
+Vector3 GetBoundingBoxExtent(const UPrimitiveOpaque* primitive)
 {
 	return ToVector3(((UPrimitiveComponent*)primitive)->Bounds.BoxExtent);
 }
@@ -413,7 +413,7 @@ uint32_t Sweep(Vector3 start,
 		result->normal = ToVector3(Out.Normal);
 		result->impact_location = ToVector3(Out.ImpactPoint);
 		result->impact_normal = ToVector3(Out.ImpactNormal);
-		result->pentration_depth = Out.PenetrationDepth;
+		result->penetration_depth = Out.PenetrationDepth;
 		result->start_penetrating = Out.bStartPenetrating;
 	}
 
@@ -460,14 +460,14 @@ uint32_t SweepMulti(Vector3 start,
 			results[i].normal = ToVector3(Hit.Normal);
 			results[i].impact_location = ToVector3(Hit.ImpactPoint);
 			results[i].impact_normal = ToVector3(Hit.ImpactNormal);
-			results[i].pentration_depth = Hit.PenetrationDepth;
+			results[i].penetration_depth = Hit.PenetrationDepth;
 			results[i].start_penetrating = Hit.bStartPenetrating;
 		}
 	}
 	return Length;
 }
 
-void GetRegisteredClasses(UClassOpague** classes, uintptr_t* len)
+void GetRegisteredClasses(UClassOpaque** classes, uintptr_t* len)
 {
 	if (classes == nullptr)
 	{
@@ -478,13 +478,13 @@ void GetRegisteredClasses(UClassOpague** classes, uintptr_t* len)
 	uintptr_t Count = *len;
 	for (uintptr_t Idx = 0; Idx < Count; ++Idx)
 	{
-		classes[Idx] = (UClassOpague*)GameMode->RegisteredClasses[Idx].Get();
+		classes[Idx] = (UClassOpaque*)GameMode->RegisteredClasses[Idx].Get();
 	}
 }
 
-UClassOpague* GetClass(const AActorOpaque* actor)
+UClassOpaque* GetClass(const AActorOpaque* actor)
 {
-	return (UClassOpague*)ToAActor(actor)->GetClass();
+	return (UClassOpaque*)ToAActor(actor)->GetClass();
 }
 
 uint32 IsMoveable(const AActorOpaque* actor)
@@ -497,7 +497,7 @@ void SetOwner(AActorOpaque* actor, const AActorOpaque* new_owner)
 	ToAActor(actor)->SetOwner(ToAActor(new_owner));
 }
 
-uint32_t GetCollisionShape(const UPrimtiveOpaque* primitive, CollisionShape* out)
+uint32_t GetCollisionShape(const UPrimitiveOpaque* primitive, CollisionShape* out)
 {
 	const FCollisionShape UnrealShape = static_cast<const UPrimitiveComponent*>(primitive)->GetCollisionShape();
 
@@ -644,7 +644,7 @@ uint32_t GetEditorComponentQuat(const AActorOpaque* actor, Uuid uuid, Utf8Str fi
 }
 
 uint32_t GetEditorComponentUObject(const AActorOpaque* actor, Uuid uuid, Utf8Str field, UObjectType ty,
-                                   UObjectOpague** out)
+                                   UObjectOpaque** out)
 {
 	FRustProperty* Prop = GetRustProperty(actor, uuid, field);
 	if (Prop == nullptr)
@@ -652,19 +652,19 @@ uint32_t GetEditorComponentUObject(const AActorOpaque* actor, Uuid uuid, Utf8Str
 
 	if (Prop->Tag == ERustPropertyTag::Class)
 	{
-		*out = static_cast<UObjectOpague*>(Prop->Class.Get());
+		*out = static_cast<UObjectOpaque*>(Prop->Class.Get());
 		return 1;
 	}
 	if (Prop->Tag == ERustPropertyTag::Sound)
 	{
-		*out = static_cast<UObjectOpague*>(Prop->Sound.Get());
+		*out = static_cast<UObjectOpaque*>(Prop->Sound.Get());
 		return 1;
 	}
 
 	return 0;
 }
 
-void PlaySoundAtLocation(const USoundBaseOpague* sound, Vector3 location, Quaternion rotation,
+void PlaySoundAtLocation(const USoundBaseOpaque* sound, Vector3 location, Quaternion rotation,
                          const SoundSettings* settings)
 {
 	auto World = GetRustModule().GameMode->GetWorld();
@@ -743,7 +743,7 @@ void GetViewportSize(LocalPlayerId player, float* x, float* y)
 	}
 }
 
-uint32_t IsA(UObjectOpague* object, UObjectType ty)
+uint32_t IsA(UObjectOpaque* object, UObjectType ty)
 {
 	if (object == nullptr)
 		return 0;
@@ -753,7 +753,7 @@ uint32_t IsA(UObjectOpague* object, UObjectType ty)
 	bool Result = false;
 	switch (ty)
 	{
-	case UObjectType::UPrimtiveComponent:
+	case UObjectType::UPrimitiveComponent:
 		Result = Cast<UPrimitiveComponent>(Object) != nullptr;
 		break;
 
