@@ -1,13 +1,13 @@
 use std::collections::{HashMap, HashSet};
 
-use bevy_ecs::schedule::ExecutorKind;
+use bevy_utils::tracing::info;
 use unreal_reflect::{registry::ReflectDyn, uuid, TypeUuid, World};
 use crate::{
     core::{EntityEvent, SendEntityEvent, UnrealCore},
     ecs::{
         event::Event,
         prelude::{Events, System},
-        schedule::{IntoSystemConfigs, Schedule, ScheduleLabel, Schedules},
+        schedule::{ExecutorKind, IntoSystemConfigs, Schedule, ScheduleLabel, Schedules},
         system::Resource,
         world::FromWorld,
     },
@@ -142,6 +142,7 @@ impl Module {
         schedule: impl ScheduleLabel,
         systems: impl IntoSystemConfigs<M>,
     ) -> &mut Self {
+        info!("System {schedule:?} added.");
         let mut schedules = self.world.resource_mut::<Schedules>();
 
         if let Some(schedule) = schedules.get_mut(&schedule) {
@@ -166,6 +167,7 @@ impl Module {
     {
         T::register_reflection(&mut self.reflection_registry);
         self.reflection_registry.uuid_set.insert(T::TYPE_UUID);
+        info!("Component was registered: {:?}", T::TYPE_UUID);
     }
 
     pub fn register_editor_component<T>(&mut self)
@@ -178,6 +180,7 @@ impl Module {
         self.reflection_registry
             .editor_components
             .insert(T::TYPE_UUID);
+        info!("Editor component was registered: {:?}", T::TYPE_UUID);
     }
 
     pub fn register_event<T>(&mut self)
@@ -190,6 +193,7 @@ impl Module {
 
         self.add_event::<EntityEvent<T>>();
         self.add_event::<T>();
+        info!("Event was registered: {:?}", T::TYPE_UUID);
     }
 
     pub fn add_plugin<P: Plugin>(&mut self, plugin: P) -> &mut Self {
@@ -198,6 +202,7 @@ impl Module {
     }
 
     pub fn add_event<T: Event>(&mut self) -> &mut Self {
+        info!("Adding an event");
         if !self.world.contains_resource::<Events<T>>() {
             self.init_resource::<Events<T>>()
                 .add_systems(EventRegistration, Events::<T>::update_system);
