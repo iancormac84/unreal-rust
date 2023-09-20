@@ -205,7 +205,8 @@ extern "C" {
         result: *mut OverlapResult,
     ) -> u32;
 
-    pub fn GetCollisionShape(primitive: *const UPrimitiveOpaque, shape: *mut CollisionShape) -> u32;
+    pub fn GetCollisionShape(primitive: *const UPrimitiveOpaque, shape: *mut CollisionShape)
+        -> u32;
 }
 
 #[repr(C)]

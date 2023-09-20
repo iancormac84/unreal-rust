@@ -152,7 +152,7 @@ struct HitResult {
   Vector3 location;
   Vector3 impact_normal;
   Vector3 impact_location;
-  float penetration_depth;
+  float pentration_depth;
   uint32_t start_penetrating;
 };
 

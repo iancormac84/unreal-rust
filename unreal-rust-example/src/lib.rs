@@ -11,7 +11,7 @@ use unreal_api::{
     register_components, register_editor_components,
     registry::USound,
     sound::{play_sound_at_location, SoundSettings},
-    Component, Startup, Update,
+    Component, PreStartup, Update,
 };
 use unreal_movement::{
     CharacterConfigComponent, CharacterControllerComponent, MovementPlugin,
@@ -332,7 +332,7 @@ impl UserModule for MyModule {
         module
             .add_plugin(MovementPlugin)
             .add_systems(
-                Startup,
+                PreStartup,
                 (
                     register_class_resource,
                     register_player_input,
