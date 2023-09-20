@@ -7,6 +7,7 @@ use std::ffi::c_void;
 
 use std::panic;
 
+use bevy_utils::tracing::info;
 use ffi::{EventType, Quaternion, StrRustAlloc};
 use unreal_reflect::{
     registry::{ReflectType, ReflectValue},
@@ -700,16 +701,19 @@ pub enum Capsule {}
 pub enum Primitive {}
 
 fn download_physics_from_unreal(mut query: Query<&mut PhysicsComponent>) {
+    info!("Inside download_physics_from_unreal inside PreUpdate");
     for mut physics in query.iter_mut() {
         physics.download_state();
     }
 }
 fn upload_physics_to_unreal(mut query: Query<&mut PhysicsComponent>) {
+    info!("Inside upload_physics_to_unreal inside PostUpdate");
     for mut physics in query.iter_mut() {
         physics.download_state();
     }
 }
 fn download_transform_from_unreal(mut query: Query<(&ActorComponent, &mut TransformComponent)>) {
+    info!("Inside download_transform_from_unreal inside PreUpdate");
     for (actor, mut transform) in query.iter_mut() {
         let mut position = ffi::Vector3::default();
         let mut rotation = ffi::Quaternion::default();
@@ -730,6 +734,7 @@ fn download_transform_from_unreal(mut query: Query<(&ActorComponent, &mut Transf
 }
 
 fn upload_transform_to_unreal(query: Query<(&ActorComponent, &TransformComponent)>) {
+    info!("Inside upload_transform_to_unreal inside PostUpdate");
     for (actor, transform) in query.iter() {
         let is_moveable = unsafe { (bindings().actor_fns.is_moveable)(actor.actor.0) } > 0;
         if !is_moveable {
@@ -746,6 +751,7 @@ fn upload_transform_to_unreal(query: Query<(&ActorComponent, &TransformComponent
 }
 
 fn update_input(mut input: ResMut<Input>) {
+    info!("Inside update_input for PreUpdate");
     input.update();
 }
 #[derive(Debug)]
@@ -778,6 +784,7 @@ fn process_actor_destroyed(
     mut reader: EventReader<ActorDestroyEvent>,
     mut commands: Commands,
 ) {
+    info!("Inside process_actor_destroyed inside EventRegistration schedule");
     for event in reader.iter() {
         if let Some(entity) = api.actor_to_entity.remove(&event.actor) {
             commands.add(Despawn { entity });
@@ -790,6 +797,7 @@ fn process_actor_spawned(
     mut reader: EventReader<ActorSpawnedEvent>,
     mut commands: Commands,
 ) {
+    info!("Inside process_actor_spawned inside EventRegistration schedule");
     unsafe {
         if let Some(global) = crate::module::MODULE.as_mut() {
             for &ActorSpawnedEvent { actor } in reader.iter() {

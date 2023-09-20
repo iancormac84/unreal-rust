@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use log::info;
 use unreal_api::{
     api::UnrealApi,
     core::{ActorComponent, ActorHitEvent, ActorPtr, Despawn, ParentComponent, TransformComponent},
@@ -102,6 +103,7 @@ impl PlayerInput {
 
 // TODO: We probably don't need that anymore
 fn register_class_resource(mut commands: Commands) {
+    info!("Inside register_class_resource inside PreStartup");
     let mut len: usize = 0;
     unsafe {
         (bindings().actor_fns.get_registered_classes)(std::ptr::null_mut(), &mut len);
@@ -185,6 +187,7 @@ fn spawn_class(
 }
 
 fn register_player_input(mut input: ResMut<Input>) {
+    info!("Inside register_player_input inside PreStartup");
     input.register_axis_binding(PlayerInput::MOVE_FORWARD);
     input.register_axis_binding(PlayerInput::MOVE_RIGHT);
     input.register_axis_binding(PlayerInput::LOOK_UP);
