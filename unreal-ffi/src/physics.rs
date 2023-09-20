@@ -87,7 +87,7 @@ pub struct HitResult {
     pub location: Vector3,
     pub impact_normal: Vector3,
     pub impact_location: Vector3,
-    pub pentration_depth: f32,
+    pub penetration_depth: f32,
     pub start_penetrating: u32,
 }
 
@@ -101,7 +101,7 @@ impl Default for HitResult {
             location: Default::default(),
             impact_location: Default::default(),
             impact_normal: Default::default(),
-            pentration_depth: Default::default(),
+            penetration_depth: Default::default(),
             start_penetrating: Default::default(),
         }
     }

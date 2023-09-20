@@ -69,7 +69,7 @@ pub fn sweep_multi(
                             impact_location: hit.impact_location.into(),
                             location: hit.location.into(),
                             normal: hit.normal.into(),
-                            penetration_depth: hit.pentration_depth,
+                            penetration_depth: hit.penetration_depth,
                             start_in_penentration: hit.start_penetrating == 1,
                             impact_normal: hit.impact_normal.into(),
                         }
