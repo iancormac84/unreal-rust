@@ -1,20 +1,20 @@
 use std::collections::{HashMap, HashSet};
 
-use crate::ecs::{
-    event::Event,
-    prelude::{Events, System},
-    schedule::{IntoSystemConfigs, Schedule, ScheduleLabel, Schedules},
-    system::Resource,
-    world::FromWorld,
-};
 use unreal_reflect::{registry::ReflectDyn, uuid, TypeUuid, World};
 
 use crate::{
     core::{EntityEvent, SendEntityEvent, UnrealCore},
+    ecs::{
+        event::Event,
+        prelude::{Events, System},
+        schedule::{IntoSystemConfigs, Schedule, ScheduleLabel, Schedules},
+        system::Resource,
+        world::FromWorld,
+    },
     editor_component::AddSerializedComponent,
     ffi::UnrealBindings,
-    main_schedule::EventRegistration,
     plugin::Plugin,
+    schedules::EventRegistration,
 };
 
 pub static mut MODULE: Option<Global> = None;

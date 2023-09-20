@@ -1,18 +1,17 @@
 use bevy_ecs::prelude::*;
-use unreal_api::api::{SweepParams, UnrealApi};
-use unreal_api::core::EntityEvent;
-use unreal_api::math::Vec2;
-use unreal_api::physics::PhysicsComponent;
-use unreal_api::registry::UClass;
 use unreal_api::{
-    core::{ActorComponent, ActorPtr, TransformComponent},
+    api::{SweepParams, UnrealApi},
+    core::{ActorComponent, ActorPtr, EntityEvent, TransformComponent},
     ffi::{self},
     input::Input,
-    math::{Quat, Vec3},
+    math::{Quat, Vec2, Vec3},
     module::{bindings, InitUserModule, Module, UserModule},
-    register_components, PostUpdate, Startup, Update,
+    physics::PhysicsComponent,
+    register_components, register_editor_components, register_events,
+    registry::UClass,
+    schedules::{PostUpdate, Startup, Update},
+    Component, Event,
 };
-use unreal_api::{register_editor_components, register_events, Component, Event};
 use unreal_movement::{
     CharacterConfigComponent, CharacterControllerComponent, MovementPlugin,
     MovementVariablesComponent,

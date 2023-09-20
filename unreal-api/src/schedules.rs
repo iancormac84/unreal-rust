@@ -1,4 +1,4 @@
-use bevy_ecs::{
+use crate::ecs::{
     schedule::ScheduleLabel,
     system::{Local, Resource},
     world::{Mut, World},

@@ -1,14 +1,13 @@
-use bevy_ecs::{prelude::*, schedule::ExecutorKind, system::Command};
+use crate::ecs::{
+    event::{Event, EventReader},
+    schedule::{ExecutorKind, Schedule},
+    system::{Command, Commands, Query, ResMut, Resource},
+};
 use std::ffi::c_void;
 
 use std::panic;
 
 use ffi::{EventType, Quaternion, StrRustAlloc};
-use unreal_api::{
-    main_schedule::{Main, MainScheduleOrder},
-    module::ReflectionRegistry,
-    Component,
-};
 use unreal_reflect::{
     registry::{ReflectType, ReflectValue},
     Entity, Uuid, World,
@@ -18,12 +17,13 @@ use crate::{
     api::UnrealApi,
     ffi::{self, AActorOpaque},
     input::Input,
-    main_schedule::{EventRegistration, PostUpdate, PreUpdate},
     math::{Quat, Vec3},
-    module::{bindings, Module, UserModule},
+    module::{bindings, Module, ReflectionRegistry, UserModule},
     physics::PhysicsComponent,
     plugin::Plugin,
-    register_components, PreStartup,
+    register_components,
+    schedules::{EventRegistration, Main, MainScheduleOrder, PostUpdate, PreStartup, PreUpdate},
+    Component,
 };
 
 pub struct UnrealCore {
