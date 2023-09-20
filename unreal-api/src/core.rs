@@ -1,6 +1,5 @@
 use crate::ecs::{
     event::{Event, EventReader},
-    schedule::{ExecutorKind, Schedule},
     system::{Command, Commands, Query, ResMut, Resource},
 };
 use std::ffi::c_void;
@@ -23,7 +22,7 @@ use crate::{
     physics::PhysicsComponent,
     plugin::Plugin,
     register_components,
-    schedules::{EventRegistration, Main, MainScheduleOrder, PostUpdate, PreStartup, PreUpdate},
+    schedules::{EventRegistration, Main, PostUpdate, PreStartup, PreUpdate},
     Component,
 };
 
@@ -35,6 +34,7 @@ pub struct CorePlugin;
 
 impl Plugin for CorePlugin {
     fn build(&self, module: &mut Module) {
+        println!("Building CorePlugin");
         register_components! {
             TransformComponent,
             ActorComponent,
@@ -44,16 +44,11 @@ impl Plugin for CorePlugin {
             => module
         };
 
-        let mut main_schedule = Schedule::new();
-        main_schedule.set_executor_kind(ExecutorKind::SingleThreaded);
-
         module
             .insert_resource(Frame::default())
             .insert_resource(Time::default())
             .insert_resource(Input::default())
             .insert_resource(UnrealApi::default())
-            .add_schedule(main_schedule, Main)
-            .init_resource::<MainScheduleOrder>()
             .add_systems(Main, Main::run_main)
             // TODO: Order matters here. Needs to be defined after the stages
             .add_event::<OnActorBeginOverlapEvent>()
@@ -77,6 +72,7 @@ impl Plugin for CorePlugin {
                 PostUpdate,
                 (upload_transform_to_unreal, upload_physics_to_unreal),
             );
+        println!("CorePlugin build complete");
     }
 }
 
@@ -84,6 +80,7 @@ impl UnrealCore {
     pub fn new(user_module: &dyn UserModule) -> Self {
         let mut module = Module::new();
         module.add_plugin(CorePlugin);
+        println!("About to initialize user_module on module");
         user_module.initialize(&mut module);
         Self { module }
     }

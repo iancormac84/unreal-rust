@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
+use bevy_ecs::schedule::ExecutorKind;
 use unreal_reflect::{registry::ReflectDyn, uuid, TypeUuid, World};
-
 use crate::{
     core::{EntityEvent, SendEntityEvent, UnrealCore},
     ecs::{
@@ -14,7 +14,7 @@ use crate::{
     editor_component::AddSerializedComponent,
     ffi::UnrealBindings,
     plugin::Plugin,
-    schedules::EventRegistration,
+    schedules::{EventRegistration, PreStartup, MainScheduleOrder, Main, Startup, PostUpdate, PreUpdate, Update},
 };
 
 pub static mut MODULE: Option<Global> = None;
@@ -100,9 +100,31 @@ pub struct Module {
 
 impl Module {
     pub fn new() -> Self {
+        println!("About to call Module::new()");
+        let mut world = World::new();
+        
+        let mut prestartup = Schedule::new();
+        prestartup.set_executor_kind(ExecutorKind::SingleThreaded);
+        world.add_schedule(prestartup, PreStartup);
+
+        let mut startup = Schedule::new();
+        startup.set_executor_kind(ExecutorKind::SingleThreaded);
+        world.add_schedule(startup, Startup);
+
+        let mut main_schedule = Schedule::new();
+        main_schedule.set_executor_kind(ExecutorKind::SingleThreaded);
+        world.add_schedule(main_schedule, Main);
+        println!("About to call init_resource on MainScheduleOrder");
+        world.init_resource::<MainScheduleOrder>();
+
+        world.add_schedule(Schedule::new(), EventRegistration);
+        world.add_schedule(Schedule::new(), PreUpdate);
+        world.add_schedule(Schedule::new(), Update);
+        world.add_schedule(Schedule::new(), PostUpdate);
+
         Self {
             reflection_registry: ReflectionRegistry::default(),
-            world: World::new(),
+            world,
         }
     }
     pub fn insert_resource(&mut self, resource: impl Resource) -> &mut Self {
@@ -224,14 +246,19 @@ macro_rules! implement_unreal_module {
                     log::error!("panic occurred");
                 }
             }));
+            println!("About to initialize BINDINGS with UnrealBindings");
             $crate::module::BINDINGS = Some(bindings);
             let _ = $crate::log::init();
 
             let r = std::panic::catch_unwind(|| unsafe {
+                println!("About to box the result of initializing InitUserModule::initialize()");
                 let module = Box::new(<$module as $crate::module::InitUserModule>::initialize());
+                println!("About to call UnrealCore::new");
                 let core = $crate::core::UnrealCore::new(module.as_ref());
 
+                println!("About to initialize MODULe with the boxed module and UnrealCore");
                 $crate::module::MODULE = Some($crate::module::Global { core, module });
+                println!("About to return RustBindings");
                 $crate::ffi::RustBindings {
                     retrieve_uuids: $crate::core::retrieve_uuids,
                     tick: $crate::core::tick,
