@@ -86,8 +86,9 @@ impl UnrealCore {
     }
 
     pub fn begin_play(&mut self, user_module: &dyn UserModule) {
+        info!("Inside begin_play, about to assign the user_module to self.");
         *self = Self::new(user_module);
-
+        info!("It was successful, and now we are about to run the PreStartup schedule.");
         self.module.world.run_schedule(PreStartup);
     }
     pub fn tick(&mut self, dt: f32) {
@@ -646,6 +647,7 @@ impl ActorPtr {
                 name.to_string()
             };
             alloc.free();
+            info!("Actor name is {name}");
             name
         }
     }
