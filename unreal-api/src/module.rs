@@ -115,10 +115,21 @@ impl Module {
         println!("About to call init_resource on MainScheduleOrder");
         world.init_resource::<MainScheduleOrder>();
 
-        world.add_schedule(Schedule::new(), EventRegistration);
-        world.add_schedule(Schedule::new(), PreUpdate);
-        world.add_schedule(Schedule::new(), Update);
-        world.add_schedule(Schedule::new(), PostUpdate);
+        let mut register_event = Schedule::new();
+        register_event.set_executor_kind(ExecutorKind::SingleThreaded);
+        world.add_schedule(register_event, EventRegistration);
+
+        let mut preupdate = Schedule::new();
+        preupdate.set_executor_kind(ExecutorKind::SingleThreaded);
+        world.add_schedule(preupdate, PreUpdate);
+
+        let mut update = Schedule::new();
+        update.set_executor_kind(ExecutorKind::SingleThreaded);
+        world.add_schedule(update, Update);
+
+        let mut postupdate = Schedule::new();
+        postupdate.set_executor_kind(ExecutorKind::SingleThreaded);
+        world.add_schedule(postupdate, PostUpdate);
 
         Self {
             reflection_registry: ReflectionRegistry::default(),
