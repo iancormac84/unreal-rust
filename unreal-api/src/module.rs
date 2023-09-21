@@ -101,7 +101,6 @@ pub struct Module {
 
 impl Module {
     pub fn new() -> Self {
-        println!("About to call Module::new()");
         let mut world = World::new();
 
         let mut startup = Schedule::new();
