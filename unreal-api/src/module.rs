@@ -16,7 +16,6 @@ use crate::{
         EventRegistration, Main, MainScheduleOrder, PostUpdate, PreUpdate, Startup, Update,
     },
 };
-use bevy_utils::tracing::info;
 use unreal_reflect::{registry::ReflectDyn, uuid, TypeUuid, World};
 
 pub static mut MODULE: Option<Global> = None;
@@ -112,7 +111,6 @@ impl Module {
         let mut main_schedule = Schedule::new();
         main_schedule.set_executor_kind(ExecutorKind::SingleThreaded);
         world.add_schedule(main_schedule, Main);
-        println!("About to call init_resource on MainScheduleOrder");
         world.init_resource::<MainScheduleOrder>();
 
         let mut register_event = Schedule::new();
@@ -151,7 +149,6 @@ impl Module {
         schedule: impl ScheduleLabel,
         systems: impl IntoSystemConfigs<M>,
     ) -> &mut Self {
-        info!("System {schedule:?} added.");
         let mut schedules = self.world.resource_mut::<Schedules>();
 
         if let Some(schedule) = schedules.get_mut(&schedule) {
@@ -176,7 +173,6 @@ impl Module {
     {
         T::register_reflection(&mut self.reflection_registry);
         self.reflection_registry.uuid_set.insert(T::TYPE_UUID);
-        info!("Component was registered: {:?}", T::TYPE_UUID);
     }
 
     pub fn register_editor_component<T>(&mut self)
@@ -189,7 +185,6 @@ impl Module {
         self.reflection_registry
             .editor_components
             .insert(T::TYPE_UUID);
-        info!("Editor component was registered: {:?}", T::TYPE_UUID);
     }
 
     pub fn register_event<T>(&mut self)
@@ -202,7 +197,6 @@ impl Module {
 
         self.add_event::<EntityEvent<T>>();
         self.add_event::<T>();
-        info!("Event was registered: {:?}", T::TYPE_UUID);
     }
 
     pub fn add_plugin<P: Plugin>(&mut self, plugin: P) -> &mut Self {
@@ -211,7 +205,6 @@ impl Module {
     }
 
     pub fn add_event<T: Event>(&mut self) -> &mut Self {
-        info!("Adding an event");
         if !self.world.contains_resource::<Events<T>>() {
             self.init_resource::<Events<T>>()
                 .add_systems(EventRegistration, Events::<T>::update_system);
@@ -260,19 +253,15 @@ macro_rules! implement_unreal_module {
                     log::error!("panic occurred");
                 }
             }));
-            println!("About to initialize BINDINGS with UnrealBindings");
+            
             $crate::module::BINDINGS = Some(bindings);
             let _ = $crate::log::init();
 
             let r = std::panic::catch_unwind(|| unsafe {
-                println!("About to box the result of initializing InitUserModule::initialize()");
                 let module = Box::new(<$module as $crate::module::InitUserModule>::initialize());
-                println!("About to call UnrealCore::new");
                 let core = $crate::core::UnrealCore::new(module.as_ref());
 
-                println!("About to initialize MODULe with the boxed module and UnrealCore");
                 $crate::module::MODULE = Some($crate::module::Global { core, module });
-                println!("About to return RustBindings");
                 $crate::ffi::RustBindings {
                     retrieve_uuids: $crate::core::retrieve_uuids,
                     tick: $crate::core::tick,

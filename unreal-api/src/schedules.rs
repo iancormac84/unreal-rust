@@ -54,7 +54,6 @@ pub struct MainScheduleOrder {
 
 impl Default for MainScheduleOrder {
     fn default() -> Self {
-        println!("Calling MainScheduleOrder::default()");
         Self {
             labels: vec![
                 Box::new(EventRegistration),
@@ -81,7 +80,6 @@ impl MainScheduleOrder {
 impl Main {
     /// A system that runs the "main schedule"
     pub fn run_main(world: &mut World, mut run_at_least_once: Local<bool>) {
-        println!("Inside run_main");
         if !*run_at_least_once {
             let _ = world.try_run_schedule(Startup);
             *run_at_least_once = true;
@@ -89,7 +87,6 @@ impl Main {
 
         world.resource_scope(|world, order: Mut<MainScheduleOrder>| {
             for label in &order.labels {
-                println!("Running thru schedules inside of Main: {label:?}");
                 let _ = world.try_run_schedule(&**label);
             }
         });
