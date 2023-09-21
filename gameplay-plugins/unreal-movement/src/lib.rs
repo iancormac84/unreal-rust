@@ -1,8 +1,13 @@
-use unreal_api::api::{SweepHit, SweepParams, UnrealApi};
-use unreal_api::core::EntityEvent;
-use unreal_api::ecs::{prelude::*, query::WorldQuery};
 use unreal_api::{
-    core::{ActorComponent, Frame, TransformComponent},
+    api::{SweepHit, SweepParams, UnrealApi},
+    core::{ActorComponent, EntityEvent, Frame, TransformComponent},
+    ecs::{
+        entity::Entity,
+        event::{EventReader, EventWriter},
+        query::WorldQuery,
+        schedule::IntoSystemConfigs,
+        system::{Query, Res},
+    },
     ffi,
     input::Input,
     log::LogCategory,
@@ -10,7 +15,8 @@ use unreal_api::{
     module::Module,
     physics::PhysicsComponent,
     plugin::Plugin,
-    register_components, PostUpdate, Update,
+    register_components,
+    schedules::{PostUpdate, Update},
 };
 use unreal_api::{register_editor_components, register_events, Component};
 fn project_onto_plane(dir: Vec3, normal: Vec3) -> Vec3 {

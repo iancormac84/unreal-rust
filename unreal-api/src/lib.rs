@@ -7,17 +7,16 @@ pub mod core;
 pub mod editor_component;
 pub mod input;
 pub mod log;
-mod main_schedule;
 pub mod module;
 pub mod physics;
 pub mod plugin;
+pub mod schedules;
 pub mod sound;
 pub use unreal_api_derive::{Component, Event};
 
 // TODO: Here for the unreal_api_derive macro. Lets restructure this
 pub use bevy_ecs as ecs;
 pub use glam as math;
-pub use main_schedule::*;
 pub use unreal_reflect::*;
 
 pub use serde;

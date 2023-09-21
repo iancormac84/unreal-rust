@@ -1,17 +1,24 @@
 use std::collections::HashMap;
 
-use bevy_ecs::prelude::*;
 use unreal_api::{
     api::UnrealApi,
     core::{ActorComponent, ActorHitEvent, ActorPtr, Despawn, ParentComponent, TransformComponent},
+    ecs::{
+        entity::Entity,
+        event::EventReader,
+        query::Added,
+        schedule::IntoSystemConfigs,
+        system::{Commands, Query, Res, ResMut, Resource},
+    },
     ffi::{self, UClassOpaque},
     input::Input,
     math::{Quat, Vec3},
     module::{bindings, InitUserModule, Module, UserModule},
     register_components, register_editor_components,
     registry::USound,
+    schedules::{Startup, Update},
     sound::{play_sound_at_location, SoundSettings},
-    Component, PreStartup, Update,
+    Component,
 };
 use unreal_movement::{
     CharacterConfigComponent, CharacterControllerComponent, MovementPlugin,
@@ -332,7 +339,7 @@ impl UserModule for MyModule {
         module
             .add_plugin(MovementPlugin)
             .add_systems(
-                PreStartup,
+                Startup,
                 (
                     register_class_resource,
                     register_player_input,

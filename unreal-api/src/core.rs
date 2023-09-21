@@ -1,14 +1,15 @@
-use bevy_ecs::{prelude::*, schedule::ExecutorKind, system::Command};
+use crate::{
+    ecs::{
+        event::{Event, EventReader},
+        system::{Command, Commands, Query, ResMut, Resource},
+    },
+    schedules::Startup,
+};
 use std::ffi::c_void;
 
 use std::panic;
 
 use ffi::{EventType, Quaternion, StrRustAlloc};
-use unreal_api::{
-    main_schedule::{Main, MainScheduleOrder},
-    module::ReflectionRegistry,
-    Component,
-};
 use unreal_reflect::{
     registry::{ReflectType, ReflectValue},
     Entity, Uuid, World,
@@ -18,12 +19,13 @@ use crate::{
     api::UnrealApi,
     ffi::{self, AActorOpaque},
     input::Input,
-    main_schedule::{EventRegistration, PostUpdate, PreUpdate},
     math::{Quat, Vec3},
-    module::{bindings, Module, UserModule},
+    module::{bindings, Module, ReflectionRegistry, UserModule},
     physics::PhysicsComponent,
     plugin::Plugin,
-    register_components, PreStartup,
+    register_components,
+    schedules::{EventRegistration, Main, PostUpdate, PreUpdate},
+    Component,
 };
 
 pub struct UnrealCore {
@@ -43,16 +45,11 @@ impl Plugin for CorePlugin {
             => module
         };
 
-        let mut main_schedule = Schedule::new();
-        main_schedule.set_executor_kind(ExecutorKind::SingleThreaded);
-
         module
             .insert_resource(Frame::default())
             .insert_resource(Time::default())
             .insert_resource(Input::default())
             .insert_resource(UnrealApi::default())
-            .add_schedule(main_schedule, Main)
-            .init_resource::<MainScheduleOrder>()
             .add_systems(Main, Main::run_main)
             // TODO: Order matters here. Needs to be defined after the stages
             .add_event::<OnActorBeginOverlapEvent>()
@@ -90,7 +87,7 @@ impl UnrealCore {
     pub fn begin_play(&mut self, user_module: &dyn UserModule) {
         *self = Self::new(user_module);
 
-        self.module.world.run_schedule(PreStartup);
+        self.module.world.run_schedule(Startup);
     }
     pub fn tick(&mut self, dt: f32) {
         if let Some(mut frame) = self.module.world.get_resource_mut::<Frame>() {

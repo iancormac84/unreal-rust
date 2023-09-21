@@ -1,13 +1,8 @@
-use bevy_ecs::{
+use crate::ecs::{
     schedule::ScheduleLabel,
     system::{Local, Resource},
     world::{Mut, World},
 };
-
-/// The schedule that runs once when the app starts.
-/// This is run by the [`Main`] schedule.
-#[derive(ScheduleLabel, Clone, Debug, PartialEq, Eq, Hash)]
-pub struct PreStartup;
 
 #[derive(ScheduleLabel, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Main;
@@ -17,7 +12,7 @@ pub struct Main;
 #[derive(ScheduleLabel, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Startup;
 
-/// The schedule that runs once after [`Startup`].
+/// The schedule that runs after [`Startup`].
 /// This is run by the [`Main`] schedule.
 #[derive(ScheduleLabel, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct EventRegistration;
@@ -61,7 +56,6 @@ impl Default for MainScheduleOrder {
     fn default() -> Self {
         Self {
             labels: vec![
-                Box::new(Startup),
                 Box::new(EventRegistration),
                 Box::new(PreUpdate),
                 Box::new(Update),
@@ -87,7 +81,7 @@ impl Main {
     /// A system that runs the "main schedule"
     pub fn run_main(world: &mut World, mut run_at_least_once: Local<bool>) {
         if !*run_at_least_once {
-            let _ = world.try_run_schedule(PreStartup);
+            let _ = world.try_run_schedule(Startup);
             *run_at_least_once = true;
         }
 

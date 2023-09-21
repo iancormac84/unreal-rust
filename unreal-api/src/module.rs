@@ -1,21 +1,22 @@
 use std::collections::{HashMap, HashSet};
 
-use crate::ecs::{
-    event::Event,
-    prelude::{Events, System},
-    schedule::{IntoSystemConfigs, Schedule, ScheduleLabel, Schedules},
-    system::Resource,
-    world::FromWorld,
-};
-use unreal_reflect::{registry::ReflectDyn, uuid, TypeUuid, World};
-
 use crate::{
     core::{EntityEvent, SendEntityEvent, UnrealCore},
+    ecs::{
+        event::Event,
+        prelude::{Events, System},
+        schedule::{ExecutorKind, IntoSystemConfigs, Schedule, ScheduleLabel, Schedules},
+        system::Resource,
+        world::FromWorld,
+    },
     editor_component::AddSerializedComponent,
     ffi::UnrealBindings,
-    main_schedule::EventRegistration,
     plugin::Plugin,
+    schedules::{
+        EventRegistration, Main, MainScheduleOrder, PostUpdate, PreUpdate, Startup, Update,
+    },
 };
+use unreal_reflect::{registry::ReflectDyn, uuid, TypeUuid, World};
 
 pub static mut MODULE: Option<Global> = None;
 pub struct Global {
@@ -100,9 +101,37 @@ pub struct Module {
 
 impl Module {
     pub fn new() -> Self {
+        println!("About to call Module::new()");
+        let mut world = World::new();
+
+        let mut startup = Schedule::new();
+        startup.set_executor_kind(ExecutorKind::SingleThreaded);
+        world.add_schedule(startup, Startup);
+
+        let mut main_schedule = Schedule::new();
+        main_schedule.set_executor_kind(ExecutorKind::SingleThreaded);
+        world.add_schedule(main_schedule, Main);
+        world.init_resource::<MainScheduleOrder>();
+
+        let mut register_event = Schedule::new();
+        register_event.set_executor_kind(ExecutorKind::SingleThreaded);
+        world.add_schedule(register_event, EventRegistration);
+
+        let mut preupdate = Schedule::new();
+        preupdate.set_executor_kind(ExecutorKind::SingleThreaded);
+        world.add_schedule(preupdate, PreUpdate);
+
+        let mut update = Schedule::new();
+        update.set_executor_kind(ExecutorKind::SingleThreaded);
+        world.add_schedule(update, Update);
+
+        let mut postupdate = Schedule::new();
+        postupdate.set_executor_kind(ExecutorKind::SingleThreaded);
+        world.add_schedule(postupdate, PostUpdate);
+
         Self {
             reflection_registry: ReflectionRegistry::default(),
-            world: World::new(),
+            world,
         }
     }
     pub fn insert_resource(&mut self, resource: impl Resource) -> &mut Self {
@@ -224,6 +253,7 @@ macro_rules! implement_unreal_module {
                     log::error!("panic occurred");
                 }
             }));
+            
             $crate::module::BINDINGS = Some(bindings);
             let _ = $crate::log::init();
 

@@ -1,6 +1,6 @@
 use std::ffi::c_void;
 
-use bevy_ecs::{entity::Entity, prelude::World};
+use crate::ecs::{entity::Entity, prelude::World};
 use glam::{Quat, Vec3};
 use serde::de::Visitor;
 use unreal_ffi as ffi;
