@@ -1,6 +1,9 @@
-use crate::ecs::{
-    event::{Event, EventReader},
-    system::{Command, Commands, Query, ResMut, Resource},
+use crate::{
+    ecs::{
+        event::{Event, EventReader},
+        system::{Command, Commands, Query, ResMut, Resource},
+    },
+    schedules::Startup,
 };
 use std::ffi::c_void;
 
@@ -22,7 +25,7 @@ use crate::{
     physics::PhysicsComponent,
     plugin::Plugin,
     register_components,
-    schedules::{EventRegistration, Main, PostUpdate, PreStartup, PreUpdate},
+    schedules::{EventRegistration, Main, PostUpdate, PreUpdate},
     Component,
 };
 
@@ -88,8 +91,8 @@ impl UnrealCore {
     pub fn begin_play(&mut self, user_module: &dyn UserModule) {
         info!("Inside begin_play, about to assign the user_module to self.");
         *self = Self::new(user_module);
-        info!("It was successful, and now we are about to run the PreStartup schedule.");
-        self.module.world.run_schedule(PreStartup);
+        info!("It was successful, and now we are about to run the Startup schedule.");
+        self.module.world.run_schedule(Startup);
     }
     pub fn tick(&mut self, dt: f32) {
         if let Some(mut frame) = self.module.world.get_resource_mut::<Frame>() {

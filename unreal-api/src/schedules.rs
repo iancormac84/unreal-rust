@@ -4,11 +4,6 @@ use crate::ecs::{
     world::{Mut, World},
 };
 
-/// The schedule that runs once when the app starts.
-/// This is run by the [`Main`] schedule.
-#[derive(ScheduleLabel, Clone, Debug, PartialEq, Eq, Hash)]
-pub struct PreStartup;
-
 #[derive(ScheduleLabel, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Main;
 

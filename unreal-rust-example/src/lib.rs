@@ -17,7 +17,7 @@ use unreal_api::{
     module::{bindings, InitUserModule, Module, UserModule},
     register_components, register_editor_components,
     registry::USound,
-    schedules::{PreStartup, Update},
+    schedules::{Startup, Update},
     sound::{play_sound_at_location, SoundSettings},
     Component,
 };
@@ -342,7 +342,7 @@ impl UserModule for MyModule {
         module
             .add_plugin(MovementPlugin)
             .add_systems(
-                PreStartup,
+                Startup,
                 (
                     register_class_resource,
                     register_player_input,

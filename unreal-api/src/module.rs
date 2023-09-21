@@ -1,7 +1,5 @@
 use std::collections::{HashMap, HashSet};
 
-use bevy_utils::tracing::info;
-use unreal_reflect::{registry::ReflectDyn, uuid, TypeUuid, World};
 use crate::{
     core::{EntityEvent, SendEntityEvent, UnrealCore},
     ecs::{
@@ -14,8 +12,12 @@ use crate::{
     editor_component::AddSerializedComponent,
     ffi::UnrealBindings,
     plugin::Plugin,
-    schedules::{EventRegistration, PreStartup, MainScheduleOrder, Main, Startup, PostUpdate, PreUpdate, Update},
+    schedules::{
+        EventRegistration, Main, MainScheduleOrder, PostUpdate, PreUpdate, Startup, Update,
+    },
 };
+use bevy_utils::tracing::info;
+use unreal_reflect::{registry::ReflectDyn, uuid, TypeUuid, World};
 
 pub static mut MODULE: Option<Global> = None;
 pub struct Global {
@@ -102,10 +104,6 @@ impl Module {
     pub fn new() -> Self {
         println!("About to call Module::new()");
         let mut world = World::new();
-        
-        let mut prestartup = Schedule::new();
-        prestartup.set_executor_kind(ExecutorKind::SingleThreaded);
-        world.add_schedule(prestartup, PreStartup);
 
         let mut startup = Schedule::new();
         startup.set_executor_kind(ExecutorKind::SingleThreaded);
