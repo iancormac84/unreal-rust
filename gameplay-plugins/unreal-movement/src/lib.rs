@@ -398,7 +398,7 @@ fn character_jump(
     mut jumps: EventReader<EntityEvent<JumpCommand>>,
     mut query: Query<MovementQuery>,
 ) {
-    for jump in jumps.iter() {
+    for jump in jumps.read() {
         if let Ok(mut movement) = query.get_mut(jump.entity) {
             let new_state = match movement.controller.movement_state {
                 MovementState::Walking => {

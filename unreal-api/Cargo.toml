@@ -5,8 +5,8 @@ edition = "2021"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-bevy_ecs = "0.11"
-bevy_utils = "0.11"
+bevy_ecs = { git = "https://github.com/bevyengine/bevy.git" }
+bevy_utils = { git = "https://github.com/bevyengine/bevy.git" }
 glam = { version = "0.24", features = ["serde"] }
 log = { version = "0.4.14", features =["std"] }
 unreal-api-derive= { path = "../unreal-api-derive" }

@@ -139,7 +139,7 @@ fn player_attack(input: Res<Input>, mut query: Query<&mut HeroComponent>) {
 }
 
 fn weapon_start(mut events: EventReader<EntityEvent<WeaponStartEvent>>) {
-    for _event in events.iter() {
+    for _event in events.read() {
         log::info!("Weapon start");
     }
 }

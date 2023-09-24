@@ -16,6 +16,7 @@ use crate::{
         EventRegistration, Main, MainScheduleOrder, PostUpdate, PreUpdate, Startup, Update,
     },
 };
+use bevy_ecs::event::event_update_system;
 use unreal_reflect::{registry::ReflectDyn, uuid, TypeUuid, World};
 
 pub static mut MODULE: Option<Global> = None;
@@ -103,30 +104,30 @@ impl Module {
     pub fn new() -> Self {
         let mut world = World::new();
 
-        let mut startup = Schedule::new();
+        let mut startup = Schedule::new(Startup);
         startup.set_executor_kind(ExecutorKind::SingleThreaded);
-        world.add_schedule(startup, Startup);
+        world.add_schedule(startup);
 
-        let mut main_schedule = Schedule::new();
+        let mut main_schedule = Schedule::new(Main);
         main_schedule.set_executor_kind(ExecutorKind::SingleThreaded);
-        world.add_schedule(main_schedule, Main);
+        world.add_schedule(main_schedule);
         world.init_resource::<MainScheduleOrder>();
 
-        let mut register_event = Schedule::new();
+        let mut register_event = Schedule::new(EventRegistration);
         register_event.set_executor_kind(ExecutorKind::SingleThreaded);
-        world.add_schedule(register_event, EventRegistration);
+        world.add_schedule(register_event);
 
-        let mut preupdate = Schedule::new();
+        let mut preupdate = Schedule::new(PreUpdate);
         preupdate.set_executor_kind(ExecutorKind::SingleThreaded);
-        world.add_schedule(preupdate, PreUpdate);
+        world.add_schedule(preupdate);
 
-        let mut update = Schedule::new();
+        let mut update = Schedule::new(Update);
         update.set_executor_kind(ExecutorKind::SingleThreaded);
-        world.add_schedule(update, Update);
+        world.add_schedule(update);
 
-        let mut postupdate = Schedule::new();
+        let mut postupdate = Schedule::new(PostUpdate);
         postupdate.set_executor_kind(ExecutorKind::SingleThreaded);
-        world.add_schedule(postupdate, PostUpdate);
+        world.add_schedule(postupdate);
 
         Self {
             reflection_registry: ReflectionRegistry::default(),
@@ -153,16 +154,11 @@ impl Module {
         if let Some(schedule) = schedules.get_mut(&schedule) {
             schedule.add_systems(systems);
         } else {
-            let mut new_schedule = Schedule::new();
+            let mut new_schedule = Schedule::new(schedule);
             new_schedule.add_systems(systems);
-            schedules.insert(schedule, new_schedule);
+            schedules.insert(new_schedule);
         }
 
-        self
-    }
-
-    pub fn add_schedule(&mut self, schedule: Schedule, label: impl ScheduleLabel) -> &mut Self {
-        self.world.add_schedule(schedule, label);
         self
     }
 
@@ -206,7 +202,7 @@ impl Module {
     pub fn add_event<T: Event>(&mut self) -> &mut Self {
         if !self.world.contains_resource::<Events<T>>() {
             self.init_resource::<Events<T>>()
-                .add_systems(EventRegistration, Events::<T>::update_system);
+                .add_systems(EventRegistration, event_update_system::<T>);
         }
         self
     }

@@ -136,7 +136,7 @@ fn play_sound_on_hit(
     query: Query<(&TransformComponent, &PlaySoundOnImpactComponent)>,
     mut commands: Commands,
 ) {
-    for event in events.iter() {
+    for event in events.read() {
         if event.normal_impulse.length() <= PlaySoundOnImpactComponent::MINIMUM_FORCE {
             continue;
         }

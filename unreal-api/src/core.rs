@@ -775,7 +775,7 @@ fn process_actor_destroyed(
     mut reader: EventReader<ActorDestroyEvent>,
     mut commands: Commands,
 ) {
-    for event in reader.iter() {
+    for event in reader.read() {
         if let Some(entity) = api.actor_to_entity.remove(&event.actor) {
             commands.add(Despawn { entity });
         }
@@ -789,7 +789,7 @@ fn process_actor_spawned(
 ) {
     unsafe {
         if let Some(global) = crate::module::MODULE.as_mut() {
-            for &ActorSpawnedEvent { actor } in reader.iter() {
+            for &ActorSpawnedEvent { actor } in reader.read() {
                 // If we have already entity for this actor, we just get their entity commands
                 let mut entity_cmds = if let Some(&entity) = api.actor_to_entity.get(&actor) {
                     commands.get_or_spawn(entity)
