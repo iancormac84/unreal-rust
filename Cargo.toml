@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "bevy-capi",
     "gameplay-plugins/unreal-movement",
     "slash-example",
     "unreal-api",
