@@ -16,8 +16,8 @@ pub fn type_uuid_derive(ast: &DeriveInput) -> proc_macro2::TokenStream {
     }
 
     let mut uuid = None;
-    for attribute in ast.attrs.iter().filter_map(|attr| attr.parse_meta().ok()) {
-        let name_value = if let Meta::NameValue(name_value) = attribute {
+    for attribute in &ast.attrs {
+        let name_value = if let Meta::NameValue(name_value) = &attribute.meta {
             name_value
         } else {
             continue;
@@ -32,8 +32,8 @@ pub fn type_uuid_derive(ast: &DeriveInput) -> proc_macro2::TokenStream {
             continue;
         }
 
-        let uuid_str = match name_value.lit {
-            Lit::Str(lit_str) => lit_str,
+        let uuid_str = match &name_value.value {
+            Expr::Lit(ExprLit { lit: Lit::Str(lit_str), .. }) => lit_str,
             _ => panic!("`uuid` attribute must take the form `#[uuid = \"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\"`."),
         };
 
