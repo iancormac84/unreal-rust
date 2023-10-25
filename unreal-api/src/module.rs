@@ -149,9 +149,10 @@ impl Module {
         schedule: impl ScheduleLabel,
         systems: impl IntoSystemConfigs<M>,
     ) -> &mut Self {
+        let schedule = schedule.intern();
         let mut schedules = self.world.resource_mut::<Schedules>();
 
-        if let Some(schedule) = schedules.get_mut(&schedule) {
+        if let Some(schedule) = schedules.get_mut(schedule) {
             schedule.add_systems(systems);
         } else {
             let mut new_schedule = Schedule::new(schedule);

@@ -1,5 +1,5 @@
 use crate::ecs::{
-    schedule::ScheduleLabel,
+    schedule::{InternedScheduleLabel, ScheduleLabel},
     system::{Local, Resource},
     world::{Mut, World},
 };
@@ -49,17 +49,17 @@ pub struct PostUpdate;
 #[derive(Resource, Debug)]
 pub struct MainScheduleOrder {
     /// The labels to run for the [`Main`] schedule (in the order they will be run).
-    pub labels: Vec<Box<dyn ScheduleLabel>>,
+    pub labels: Vec<InternedScheduleLabel>,
 }
 
 impl Default for MainScheduleOrder {
     fn default() -> Self {
         Self {
             labels: vec![
-                Box::new(EventRegistration),
-                Box::new(PreUpdate),
-                Box::new(Update),
-                Box::new(PostUpdate),
+                EventRegistration.intern(),
+                PreUpdate.intern(),
+                Update.intern(),
+                PostUpdate.intern(),
             ],
         }
     }
@@ -73,7 +73,7 @@ impl MainScheduleOrder {
             .iter()
             .position(|current| (**current).eq(&after))
             .unwrap_or_else(|| panic!("Expected {after:?} to exist"));
-        self.labels.insert(index + 1, Box::new(schedule));
+        self.labels.insert(index + 1, schedule.intern());
     }
 }
 
@@ -86,8 +86,8 @@ impl Main {
         }
 
         world.resource_scope(|world, order: Mut<MainScheduleOrder>| {
-            for label in &order.labels {
-                let _ = world.try_run_schedule(&**label);
+            for &label in &order.labels {
+                let _ = world.try_run_schedule(label);
             }
         });
     }
