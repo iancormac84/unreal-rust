@@ -147,17 +147,15 @@ fn weapon_start(mut events: EventReader<EntityEvent<WeaponStartEvent>>) {
 fn register_weapon(
     api: Res<UnrealApi>,
     mut hero: Query<&mut HeroComponent>,
-    query: Query<(Entity, &ActorComponent, Added<WeaponComponentTag>)>,
+    query: Query<(Entity, &ActorComponent), Added<WeaponComponentTag>>,
 ) {
-    for (entity, actor, added) in &query {
-        if added {
-            log::info!("Added");
-            if let Some(parent) = actor.get_parent(&api) {
-                log::info!("parent");
-                if let Ok(mut hero) = hero.get_mut(parent) {
-                    log::info!("hero");
-                    hero.weapon = Some(entity);
-                }
+    for (entity, actor) in &query {
+        log::info!("Added");
+        if let Some(parent) = actor.get_parent(&api) {
+            log::info!("parent");
+            if let Ok(mut hero) = hero.get_mut(parent) {
+                log::info!("hero");
+                hero.weapon = Some(entity);
             }
         }
     }

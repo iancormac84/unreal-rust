@@ -4,7 +4,7 @@ use unreal_api::{
     ecs::{
         entity::Entity,
         event::{EventReader, EventWriter},
-        query::WorldQuery,
+        query::QueryData,
         schedule::IntoSystemConfigs,
         system::{Query, Res},
     },
@@ -181,8 +181,8 @@ fn do_gliding(movement: &mut MovementQueryItem, dt: f32, api: &UnrealApi) -> Opt
     }
 }
 
-#[derive(WorldQuery)]
-#[world_query(mutable)]
+#[derive(QueryData)]
+#[query_data(mutable)]
 pub struct MovementQuery {
     entity: Entity,
     actor: &'static ActorComponent,

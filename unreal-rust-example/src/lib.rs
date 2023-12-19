@@ -122,11 +122,9 @@ fn register_class_resource(mut commands: Commands) {
     commands.insert_resource(classes_resource);
 }
 
-fn register_hit_events(mut query: Query<(&mut ActorComponent, Added<PlaySoundOnImpactComponent>)>) {
-    for (mut actor, added) in &mut query {
-        if added {
-            actor.register_on_hit();
-        }
+fn register_hit_events(mut query: Query<&mut ActorComponent, Added<PlaySoundOnImpactComponent>>) {
+    for mut actor in &mut query {
+        actor.register_on_hit();
     }
 }
 
@@ -262,9 +260,9 @@ fn rotate_camera(mut query: Query<(&mut TransformComponent, &mut CameraComponent
 
 fn spawn_camera(
     mut commands: Commands,
-    mut query: Query<(Entity, &ActorComponent, Added<CharacterControllerComponent>)>,
+    mut query: Query<(Entity, &ActorComponent), Added<CharacterControllerComponent>>,
 ) {
-    for (entity, _, added) in query.iter_mut() {
+    for (entity, _) in query.iter_mut() {
         if !added {
             continue;
         }
