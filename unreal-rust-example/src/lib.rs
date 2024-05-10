@@ -263,9 +263,9 @@ fn spawn_camera(
     mut query: Query<(Entity, &ActorComponent), Added<CharacterControllerComponent>>,
 ) {
     for (entity, _) in query.iter_mut() {
-        if !added {
+        /*if !added {
             continue;
-        }
+        }*/
         let pos = Vec3::new(-2587.0, -1800.0, 150.0);
         unsafe {
             let actor = (bindings().spawn_actor)(
