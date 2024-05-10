@@ -274,7 +274,7 @@ fn update_controller_view(
 ) {
     for cam in &topdown {
         if let Ok(mut controller) =
-            movement.get_component_mut::<CharacterControllerComponent>(cam.target)
+            movement.get_mut(cam.target)
         {
             controller.camera_view = Quat::from_rotation_z(cam.rotation);
         }

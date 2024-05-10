@@ -26,7 +26,7 @@ pub(crate) fn event_derive(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
                 use unreal_api::core::{ SendEntityEvent, EntityEvent };
                 use unreal_api::*;
                 use unreal_api::module::*;
-                use unreal_api::ecs::component::{Component, TableStorage};
+                use unreal_api::ecs::component::{Component, StorageType};
 
                 struct #send_event_ident;
 
@@ -34,7 +34,7 @@ pub(crate) fn event_derive(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
 
                 // TODO: This should not be here. Events are not components, but reflect currently requires it.
                 impl Component for #struct_ident {
-                    type Storage = TableStorage;
+                    const STORAGE_TYPE: StorageType = StorageType::Table;
                 }
             };
         }

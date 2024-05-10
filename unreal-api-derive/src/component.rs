@@ -27,7 +27,7 @@ pub fn component_derive(ast: &DeriveInput) -> proc_macro2::TokenStream {
                     unsafe fn add_serialized_component(
                         &self,
                         json: &str,
-                        commands: &mut bevy_ecs::system::EntityCommands<'_, '_, '_>,
+                        commands: &mut bevy_ecs::system::EntityCommands<'_>,
                     ) {
                         let component = unreal_api::serde_json::de::from_str::<#struct_ident>(json).expect(json);
                         commands.insert(component);
@@ -51,14 +51,14 @@ pub fn component_derive(ast: &DeriveInput) -> proc_macro2::TokenStream {
 
             const _:() = {
                 use unreal_api::*;
-                use unreal_api::ecs::component::{Component, TableStorage};
+                use unreal_api::ecs::component::{Component, StorageType};
                 use unreal_api::module::*;
                 use unreal_api::editor_component::*;
 
                 struct #add_serialized_ident;
 
                 impl Component for #struct_ident {
-                    type Storage = TableStorage;
+                    const STORAGE_TYPE: StorageType = StorageType::Table;
                 }
 
                 #register_add_serialized_component

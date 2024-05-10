@@ -203,7 +203,7 @@ impl Module {
     pub fn add_event<T: Event>(&mut self) -> &mut Self {
         if !self.world.contains_resource::<Events<T>>() {
             self.init_resource::<Events<T>>()
-                .add_systems(EventRegistration, event_update_system::<T>);
+                .add_systems(EventRegistration, event_update_system);
         }
         self
     }

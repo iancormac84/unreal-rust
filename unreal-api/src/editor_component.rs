@@ -17,7 +17,7 @@ pub trait AddSerializedComponent {
     unsafe fn add_serialized_component(
         &self,
         json: &str,
-        commands: &mut EntityCommands<'_, '_, '_>,
+        commands: &mut EntityCommands<'_>,
     );
 }
 

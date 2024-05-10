@@ -226,7 +226,7 @@ fn update_controller_view(
 ) {
     for (parent, spatial, _) in camera.iter() {
         if let Ok(mut movement) =
-            movement.get_component_mut::<CharacterControllerComponent>(parent.parent)
+            movement.get_mut(parent.parent)
         {
             movement.camera_view = spatial.rotation;
         }
@@ -296,11 +296,11 @@ fn update_camera(
 ) {
     for (entity, parent, camera) in query.iter_mut() {
         let spatial_parent = spatial_query
-            .get_component::<TransformComponent>(parent.parent)
+            .get(parent.parent)
             .ok()
             .cloned();
         let spatial = spatial_query
-            .get_component_mut::<TransformComponent>(entity)
+            .get_mut(entity)
             .ok();
         if let (Some(mut spatial), Some(parent)) = (spatial, spatial_parent) {
             let local_offset = match camera.mode {

@@ -7,7 +7,7 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 bevy_ecs = { git = "https://github.com/bevyengine/bevy.git" }
 bevy_utils = { git = "https://github.com/bevyengine/bevy.git" }
-glam = { version = "0.24", features = ["serde"] }
+glam = { version = "0.27", features = ["serde"] }
 log = { version = "0.4.14", features =["std"] }
 unreal-api-derive= { path = "../unreal-api-derive" }
 unreal-reflect= { path = "../unreal-reflect" }

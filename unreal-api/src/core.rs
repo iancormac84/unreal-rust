@@ -1,7 +1,8 @@
 use crate::{
     ecs::{
         event::{Event, EventReader},
-        system::{Command, Commands, Query, ResMut, Resource},
+        system::{Commands, Query, ResMut, Resource},
+        world::Command,
     },
     schedules::Startup,
 };
